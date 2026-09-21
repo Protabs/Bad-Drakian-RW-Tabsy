@@ -296,6 +296,7 @@
 	awakener.familiar_summoner = user
 	awakener.fully_replace_character_name(null, prefs.familiar_name)
 	awakener.pronouns = prefs.familiar_pronouns
+	awakener.color = "#[prefs.familiar_color]"
 
 	// Display summoning emote
 	user.visible_message(span_notice("[awakener.summoning_emote]"))
