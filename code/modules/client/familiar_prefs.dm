@@ -3,6 +3,7 @@
 	var/datum/preferences/prefs
 	var/familiar_name
 	var/familiar_specie
+	var/familiar_color = "FFFFFF"
 	var/familiar_headshot_link
 	var/familiar_flavortext
 	var/familiar_flavortext_display
@@ -17,12 +18,59 @@
 	. = ..()
 	prefs = passed_prefs
 
+/datum/familiar_prefs/proc/get_familiar_preview_html()
+	if(!familiar_specie)
+		return ""
+
+	var/preview_state
+	var/preview_alpha = 255
+	switch(familiar_specie)
+		if(/mob/living/simple_animal/pet/familiar/pondstone_toad)
+			preview_state = "pondstone"
+		if(/mob/living/simple_animal/pet/familiar/mist_lynx)
+			preview_state = "mist"
+			preview_alpha = 150
+		if(/mob/living/simple_animal/pet/familiar/rune_rat)
+			preview_state = "runerat"
+		if(/mob/living/simple_animal/pet/familiar/vaporroot_wisp)
+			preview_state = "vaporroot"
+			preview_alpha = 150
+		if(/mob/living/simple_animal/pet/familiar/ashcoiler)
+			preview_state = "ashcoiler"
+		if(/mob/living/simple_animal/pet/familiar/glimmer_hare)
+			preview_state = "glimmer"
+			preview_alpha = 150
+		if(/mob/living/simple_animal/pet/familiar/hollow_antlerling)
+			preview_state = "antlerling"
+		if(/mob/living/simple_animal/pet/familiar/gravemoss_serpent)
+			preview_state = "gravemoss"
+		if(/mob/living/simple_animal/pet/familiar/starfield_crow)
+			preview_state = "crow_flying"
+		if(/mob/living/simple_animal/pet/familiar/emberdrake)
+			preview_state = "emberdrake"
+		if(/mob/living/simple_animal/pet/familiar/ripplefox)
+			preview_state = "ripple"
+		if(/mob/living/simple_animal/pet/familiar/whisper_stoat)
+			preview_state = "whisper"
+		if(/mob/living/simple_animal/pet/familiar/thornback_turtle)
+			preview_state = "thornback"
+	if(!preview_state)
+		return ""
+
+	var/image/preview = image('icons/roguetown/mob/familiars.dmi', null, preview_state)
+	preview.alpha = preview_alpha
+	preview.color = "#[familiar_color]"
+	var/icon/flat_preview = getFlatIcon(preview, no_anim = TRUE)
+	flat_preview.Scale(flat_preview.Width() * 4, flat_preview.Height() * 4)
+	return "<div align='center'><img src='data:image/png;base64, [icon2base64(flat_preview)]' width='256px' height='256px' style='image-rendering: pixelated; image-rendering: crisp-edges;'></div>"
+
 /datum/familiar_prefs/proc/fam_show_ui()
 	var/client/client = prefs?.parent
 	if (!client)
 		return
 
 	var/list/dat = list()
+	dat += "<table width='100%'><tr><td width='55%' valign='top'>"
 		// --- Familiar species display using mapping ---
 	if (familiar_specie && GLOB.familiar_display_names[familiar_specie])
 		var/specie_type = GLOB.familiar_display_names[familiar_specie] ? GLOB.familiar_display_names[familiar_specie] : "Unknown Species"
@@ -57,6 +105,7 @@
 			display_name = name
 			break
 	dat += "<br><b>Selected Familiar Type:</b> <a href='?_src_=familiar_prefs;preference=familiar_specie;task=select'>[display_name]</a>"
+	dat += "<br><b>Familiar Color:</b> <span style='border: 1px solid #161616; background-color: #[familiar_color];'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> <a href='?_src_=familiar_prefs;preference=familiar_color;task=input'>Change</a>"
 
 	if (familiar_specie)
 		var/lore_blurb = GLOB.familiar_lore_blurbs[familiar_specie]
@@ -67,13 +116,14 @@
 			dat += "<br><b>Abilities:</b>"
 			for (var/ability_name in ability_blurbs)
 				dat += "<details><summary>[ability_name]</summary><div>[ability_blurbs[ability_name]]</div></details>"
-
 	if (client in GLOB.familiar_queue)
 		dat += "<br><a href='?_src_=familiar_prefs;preference=familiar_queue;task=leave'>Leave Queue</a>"
 	else
 		dat += "<br><a href='?_src_=familiar_prefs;preference=familiar_queue;task=join'>Queue Up</a>"
 
-	var/datum/browser/popup = new(client?.mob, "Be a Familiar", "<center>Be a Familiar</center>", 330, 410)
+	dat += "</td><td width='45%' valign='top' align='center'><b>Preview</b>[get_familiar_preview_html()]</td></tr></table>"
+
+	var/datum/browser/popup = new(client?.mob, "Be a Familiar", "<center>Be a Familiar</center>", 700, 500)
 	popup.set_window_options("can_close=1")
 	popup.set_content(dat.Join())
 	popup.open(FALSE)
@@ -106,6 +156,12 @@
 			if(choice)
 				familiar_pronouns = pronoun_options[choice]
 				to_chat(user, "<span class='notice'>Familiar pronouns set to [choice].</span>")
+
+		if ("familiar_color")
+			var/new_color = color_pick_sanitized(user, "Choose your familiar's color:", "Familiar Preference", "#[familiar_color]")
+			if(new_color)
+				familiar_color = sanitize_hexcolor(new_color)
+				to_chat(user, "<span class='notice'>Familiar color updated.</span>")
 				
 		if("familiar_headshot")
 			to_chat(user, "<span class='notice'>Please use a relatively SFW image of the head and shoulder area to maintain immersion level. <b>Do not use a real life photo or unserious images.</b></span>")
