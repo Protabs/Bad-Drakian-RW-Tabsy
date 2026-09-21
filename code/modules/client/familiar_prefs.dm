@@ -62,6 +62,11 @@
 		var/lore_blurb = GLOB.familiar_lore_blurbs[familiar_specie]
 		if (lore_blurb)
 			dat += "<br><i><b>Lore inspiration:</b> [lore_blurb]</i>"
+		var/list/ability_blurbs = GLOB.familiar_ability_blurbs[familiar_specie]
+		if (ability_blurbs)
+			dat += "<br><b>Abilities:</b>"
+			for (var/ability_name in ability_blurbs)
+				dat += "<details><summary>[ability_name]</summary><div>[ability_blurbs[ability_name]]</div></details>"
 
 	if (client in GLOB.familiar_queue)
 		dat += "<br><a href='?_src_=familiar_prefs;preference=familiar_queue;task=leave'>Leave Queue</a>"

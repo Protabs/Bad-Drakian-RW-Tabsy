@@ -45,3 +45,19 @@ GLOBAL_LIST_INIT(familiar_lore_blurbs, list(
 	/mob/living/simple_animal/pet/familiar/whisper_stoat = "Whisper Stoats are subtle and insightful, listening to thoughts and secrets. They are trusted confidants and clever companions.",
 	/mob/living/simple_animal/pet/familiar/thornback_turtle = "Thornback Turtles are sturdy guardians, embodying endurance and protection. They are slow to anger but steadfast in defense of their friends.",
 ))
+
+GLOBAL_LIST_INIT(familiar_ability_blurbs, list(
+	/mob/living/simple_animal/pet/familiar/pondstone_toad = list("Stillness of Stone" = "Become an immobile stone, blending into the surroundings until you return to your natural form."),
+	/mob/living/simple_animal/pet/familiar/mist_lynx = list("Lurking Step" = "Mark up to three locations.", "Veilbound Shift" = "Teleport to a marked location."),
+	/mob/living/simple_animal/pet/familiar/rune_rat = list("Inscription Cache" = "Store up to five books or papers.", "Recall Cache" = "Retrieve a stored item."),
+	/mob/living/simple_animal/pet/familiar/vaporroot_wisp = list("Soothing Bloom" = "Heal nearby living allies over time.", "Flight" = "Fly over suitable terrain."),
+	/mob/living/simple_animal/pet/familiar/ashcoiler = list("Smolder Shroud" = "Release a cloud of smoke around yourself."),
+	/mob/living/simple_animal/pet/familiar/glimmer_hare = list("Blink" = "Instantly teleport a short distance."),
+	/mob/living/simple_animal/pet/familiar/hollow_antlerling = list("Verdant Veil" = "Briefly conceal nearby allies in illusionary invisibility.", "Glow Petals" = "Leave glowing petals while moving."),
+	/mob/living/simple_animal/pet/familiar/gravemoss_serpent = list("Scent of the Grave" = "Detect and track the direction of nearby corpses."),
+	/mob/living/simple_animal/pet/familiar/starfield_crow = list("Starseer's Cry" = "Reveal nearby invisible or sneaking creatures.", "Flight" = "Fly over suitable terrain."),
+	/mob/living/simple_animal/pet/familiar/emberdrake = list("Pyroclastic Puff" = "Emit sparks at the tile ahead or an adjacent target."),
+	/mob/living/simple_animal/pet/familiar/ripplefox = list("Phantom Flicker" = "Create an illusory duplicate that vanishes after a short time."),
+	/mob/living/simple_animal/pet/familiar/whisper_stoat = list("Phantasm Fade" = "Become invisible for a short time."),
+	/mob/living/simple_animal/pet/familiar/thornback_turtle = list("Verdant Sprout" = "Turn dirt into grass or grow a bush on suitable grass."),
+))
