@@ -986,6 +986,9 @@ GLOBAL_VAR_INIT(farm_animals, FALSE)
 			l_hand.screen_loc = ui_hand_position(get_held_index_of_item(l_hand))
 			client.screen |= l_hand
 
+/mob/living/simple_animal/proc/refresh_equipment_screen()
+	return
+
 //ANIMAL RIDING
 
 /mob/living/simple_animal/hostile/user_unbuckle_mob(mob/living/M, mob/user)

@@ -48,6 +48,12 @@
 	pooptype = null
 	footstep_type = FOOTSTEP_MOB_BAREFOOT
 	var/obj/item/mouth = null
+	var/obj/item/familiar_neck
+	var/obj/item/familiar_belt
+	var/obj/item/familiar_belt_left
+	var/obj/item/familiar_belt_right
+	var/obj/item/familiar_head
+	var/obj/item/familiar_cloak
 
 	var/buff_given = list()
 	var/mob/living/carbon/familiar_summoner = null
@@ -57,6 +63,151 @@
 	var/flight_capable = FALSE
 	var/flight_time = 2 SECONDS
 
+/mob/living/simple_animal/pet/familiar/get_item_by_slot(slot_id)
+	switch(slot_id)
+		if(SLOT_NECK)
+			return familiar_neck
+		if(SLOT_BELT)
+			return familiar_belt
+		if(SLOT_BELT_L)
+			return familiar_belt_left
+		if(SLOT_BELT_R)
+			return familiar_belt_right
+		if(SLOT_HEAD)
+			return familiar_head
+		if(SLOT_CLOAK)
+			return familiar_cloak
+	return ..()
+
+/mob/living/simple_animal/pet/familiar/get_equipped_items(include_pockets = FALSE, include_beltslots = TRUE)
+	var/list/equipped_items = list()
+	for(var/slot_id in list(SLOT_NECK, SLOT_BELT, SLOT_BELT_L, SLOT_BELT_R, SLOT_HEAD, SLOT_CLOAK))
+		if(!include_beltslots && (slot_id == SLOT_BELT_L || slot_id == SLOT_BELT_R))
+			continue
+		var/obj/item/equipped_item = get_item_by_slot(slot_id)
+		if(equipped_item)
+			equipped_items += equipped_item
+	return equipped_items
+
+/mob/living/simple_animal/pet/familiar/can_equip(obj/item/I, slot, disable_warning = FALSE, bypass_equip_delay_self = FALSE)
+	if(!I || QDELETED(I) || get_item_by_slot(slot))
+		return FALSE
+	var/required_slot_flag
+	switch(slot)
+		if(SLOT_NECK)
+			required_slot_flag = ITEM_SLOT_NECK
+		if(SLOT_BELT)
+			required_slot_flag = ITEM_SLOT_BELT
+		if(SLOT_BELT_L, SLOT_BELT_R)
+			if(!familiar_belt)
+				return FALSE
+			required_slot_flag = ITEM_SLOT_HIP
+		if(SLOT_HEAD)
+			required_slot_flag = ITEM_SLOT_HEAD
+		if(SLOT_CLOAK)
+			required_slot_flag = ITEM_SLOT_CLOAK
+	if(!required_slot_flag || !(I.slot_flags & required_slot_flag))
+		return FALSE
+	return TRUE
+
+/mob/living/simple_animal/pet/familiar/equip_to_slot(obj/item/I, slot, redraw_mob = TRUE, initial = FALSE)
+	if(!I)
+		return FALSE
+	var/held_index = get_held_index_of_item(I)
+	if(held_index)
+		held_items[held_index] = null
+	if(I.pulledby)
+		I.pulledby.stop_pulling()
+	remove_screen_object(I)
+	I.forceMove(src)
+	I.layer = ABOVE_HUD_LAYER
+	I.plane = ABOVE_HUD_PLANE
+	I.appearance_flags |= NO_CLIENT_COLOR
+	switch(slot)
+		if(SLOT_NECK)
+			familiar_neck = I
+		if(SLOT_BELT)
+			familiar_belt = I
+		if(SLOT_BELT_L)
+			familiar_belt_left = I
+		if(SLOT_BELT_R)
+			familiar_belt_right = I
+		if(SLOT_HEAD)
+			familiar_head = I
+		if(SLOT_CLOAK)
+			familiar_cloak = I
+	I.equipped(src, slot, initial)
+	update_inv_hands()
+	refresh_equipment_screen()
+	if(hud_used)
+		var/atom/movable/screen/inventory/inventory_slot = hud_used.inv_slots[slot]
+		if(inventory_slot)
+			inventory_slot.update_icon()
+		hud_used.throw_icon?.update_icon()
+		hud_used.give_intent?.update_icon()
+	return TRUE
+
+/mob/living/simple_animal/pet/familiar/doUnEquip(obj/item/I, force, newloc, no_move, invdrop = TRUE, silent = FALSE)
+	. = ..()
+	if(!. || !I)
+		return
+	var/slot_id
+	if(I == familiar_neck)
+		familiar_neck = null
+		slot_id = SLOT_NECK
+	else if(I == familiar_belt)
+		if(familiar_belt_left)
+			dropItemToGround(familiar_belt_left, TRUE, silent = silent)
+		if(familiar_belt_right)
+			dropItemToGround(familiar_belt_right, TRUE, silent = silent)
+		familiar_belt = null
+		slot_id = SLOT_BELT
+	else if(I == familiar_belt_left)
+		familiar_belt_left = null
+		slot_id = SLOT_BELT_L
+	else if(I == familiar_belt_right)
+		familiar_belt_right = null
+		slot_id = SLOT_BELT_R
+	else if(I == familiar_head)
+		familiar_head = null
+		slot_id = SLOT_HEAD
+	else if(I == familiar_cloak)
+		familiar_cloak = null
+		slot_id = SLOT_CLOAK
+	if(slot_id && hud_used)
+		var/atom/movable/screen/inventory/inventory_slot = hud_used.inv_slots[slot_id]
+		if(inventory_slot)
+			inventory_slot.update_icon()
+
+/mob/living/simple_animal/pet/familiar/refresh_equipment_screen()
+	if(!client || !hud_used)
+		return
+	var/static/list/slot_screen_locs = list(
+		"[SLOT_NECK]" = rogueui_neck,
+		"[SLOT_BELT]" = rogueui_belt,
+		"[SLOT_BELT_L]" = rogueui_beltl,
+		"[SLOT_BELT_R]" = rogueui_beltr,
+		"[SLOT_HEAD]" = rogueui_head,
+		"[SLOT_CLOAK]" = rogueui_cloak,
+	)
+	for(var/slot_key in slot_screen_locs)
+		var/obj/item/equipped_item = get_item_by_slot(text2num(slot_key))
+		if(!equipped_item)
+			continue
+		if(hud_used.hud_version == HUD_STYLE_NOHUD)
+			remove_screen_object(equipped_item)
+			continue
+		equipped_item.screen_loc = slot_screen_locs[slot_key]
+		equipped_item.layer = ABOVE_HUD_LAYER
+		equipped_item.plane = ABOVE_HUD_PLANE
+		add_screen_object(equipped_item)
+
+/mob/living/simple_animal/pet/familiar/proc/drop_familiar_equipment()
+	for(var/slot_id in list(SLOT_NECK, SLOT_BELT, SLOT_BELT_L, SLOT_BELT_R, SLOT_HEAD, SLOT_CLOAK))
+		var/obj/item/equipped_item = get_item_by_slot(slot_id)
+		if(equipped_item)
+			dropItemToGround(equipped_item, force = TRUE, silent = TRUE)
+
 //As far as I am aware, you cannot pat out fire as a familiar at least not in time for it to not kill you, this seems fair.
 /mob/living/simple_animal/pet/familiar/fire_act(added, maxstacks)
 	. = ..()
@@ -65,7 +216,6 @@
 /mob/living/simple_animal/pet/familiar/Initialize(mapload)
 	. = ..()
 	ADD_TRAIT(src, TRAIT_NOFALLDAMAGE1, TRAIT_GENERIC)
-	ADD_TRAIT(src, TRAIT_CHUNKYFINGERS, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_INFINITE_STAMINA, TRAIT_GENERIC)
 	AddComponent(/datum/component/footstep, footstep_type)
 	if(flight_capable)
@@ -119,12 +269,14 @@
 	duration = -1
 
 /mob/living/simple_animal/pet/familiar/death()
+	drop_familiar_equipment()
 	. = ..()
 	emote("deathgasp")
 	if(familiar_summoner)
 		to_chat(familiar_summoner, span_warning("[src.name] has fallen, and your bond dims. Yet in the quiet beyond, a flicker of their essence remains."))
 
 /mob/living/simple_animal/pet/familiar/Destroy()
+	drop_familiar_equipment()
 	if(familiar_summoner)
 		if(buff_given)
 			familiar_summoner.remove_status_effect(buff_given)

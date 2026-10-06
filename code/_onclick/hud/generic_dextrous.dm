@@ -340,6 +340,9 @@
 		for(var/obj/item/I in D.held_items)
 			I.screen_loc = null
 			D.client.screen -= I
+	if(istype(D, /mob/living/simple_animal))
+		var/mob/living/simple_animal/animal = D
+		animal.refresh_equipment_screen()
 
 
 //Dextrous simple mobs can use hands!
