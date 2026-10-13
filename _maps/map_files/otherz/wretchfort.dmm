@@ -22,8 +22,8 @@
 /area/rogue/under/wretch/cavern)
 "au" = (
 /obj/effect/decal/edge{
-	color = "#3f3f3f";
-	dir = 1
+	dir = 1;
+	color = "#3f3f3f"
 	},
 /obj/machinery/light/rogue/candle/red/r,
 /turf/open/floor/rogue/blocks,
@@ -247,8 +247,8 @@
 /area/rogue/under/wretch/temple)
 "cx" = (
 /obj/structure/roguemachine/goldface/copperface{
-	pixel_y = 32;
-	density = 0
+	density = 0;
+	pixel_y = 32
 	},
 /turf/open/floor/rogue/ruinedwood/spiral,
 /area/rogue/under/wretch)
@@ -377,8 +377,8 @@
 /area/rogue/under/wretch)
 "dG" = (
 /obj/structure/roguemachine/lottery_roguetown{
-	pixel_y = 0;
-	pixel_x = -32
+	pixel_x = -32;
+	pixel_y = 0
 	},
 /turf/open/floor/rogue/naturalstone,
 /area/rogue/under/wretch/cavern)
@@ -569,16 +569,16 @@
 /area/rogue/outdoors/wretch)
 "fU" = (
 /obj/structure/table/wood{
-	dir = 9;
-	icon_state = "largetable"
+	icon_state = "largetable";
+	dir = 9
 	},
 /obj/item/reagent_containers/glass/bowl,
 /turf/open/floor/carpet/royalblack,
 /area/rogue/under/wretch)
 "fY" = (
 /obj/structure/far_travel{
-	desc = "The everwinter fields of Gehenna beckon you. Anywhere is better than here.\n(Drag your sprite onto this to exit the round!)";
-	name = "Road to Gehenna"
+	name = "Road to Gehenna";
+	desc = "The everwinter fields of Gehenna beckon you. Anywhere is better than here.\n(Drag your sprite onto this to exit the round!)"
 	},
 /turf/open/floor/rogue/dirt,
 /area/rogue/outdoors/wretch)
@@ -588,8 +588,8 @@
 /area/rogue/outdoors/wretch)
 "gg" = (
 /obj/structure/table/wood{
-	dir = 10;
-	icon_state = "largetable"
+	icon_state = "largetable";
+	dir = 10
 	},
 /turf/open/floor/rogue/herringbone,
 /area/rogue/under/wretch)
@@ -774,8 +774,8 @@
 /area/rogue/outdoors/wretch)
 "iv" = (
 /obj/structure/table/wood{
-	dir = 1;
-	icon_state = "longtable"
+	icon_state = "longtable";
+	dir = 1
 	},
 /obj/item/reagent_containers/glass/cup/skull{
 	pixel_x = 3;
@@ -941,8 +941,8 @@
 /area/rogue/outdoors/wretch)
 "jQ" = (
 /obj/structure/mineral_door/wood/deadbolt{
-	dir = 8;
-	name = "Guest Room"
+	name = "Guest Room";
+	dir = 8
 	},
 /turf/open/floor/rogue/cobble,
 /area/rogue/under/wretch)
@@ -1065,9 +1065,9 @@
 "lc" = (
 /obj/machinery/light/rogue/candle/l,
 /obj/effect/decal/carpet/kover_black{
+	dir = 4;
 	pixel_x = 6;
-	pixel_y = -1;
-	dir = 4
+	pixel_y = -1
 	},
 /obj/structure/bed/rogue/inn{
 	dir = 8
@@ -1086,8 +1086,8 @@
 	dir = 1
 	},
 /obj/effect/decal/cobbleedge{
-	dir = 1;
-	icon_state = "borderfall"
+	icon_state = "borderfall";
+	dir = 1
 	},
 /turf/open/floor/rogue/naturalstone,
 /area/rogue/under/wretch/cavern)
@@ -1243,8 +1243,8 @@
 /area/rogue/under/wretch)
 "mN" = (
 /obj/structure/table/wood{
-	dir = 1;
-	icon_state = "longtable"
+	icon_state = "longtable";
+	dir = 1
 	},
 /turf/open/floor/rogue/cobble,
 /area/rogue/under/wretch)
@@ -1328,11 +1328,11 @@
 /area/rogue/outdoors/wretch)
 "nx" = (
 /obj/effect/wisp/prestidigitation{
-	color = "#ffff00";
-	desc = "A small, fiery ball of light made up of mystical energy.";
-	light_color = "#33ff00";
 	name = "Will-o'-the-wisp";
-	pixel_x = 0
+	desc = "A small, fiery ball of light made up of mystical energy.";
+	pixel_x = 0;
+	color = "#ffff00";
+	light_color = "#33ff00"
 	},
 /turf/open/floor/rogue/dirt,
 /area/rogue/under/wretch/cavern)
@@ -1396,8 +1396,8 @@
 /area/rogue/under/wretch)
 "nX" = (
 /obj/structure/fluff/pillow/magenta{
-	color = "#5232a8";
-	dir = 8
+	dir = 8;
+	color = "#5232a8"
 	},
 /turf/open/floor/rogue/naturalstone,
 /area/rogue/outdoors/wretch)
@@ -1422,8 +1422,8 @@
 /area/rogue/outdoors/wretch)
 "oo" = (
 /obj/structure/table/wood{
-	dir = 8;
-	icon_state = "largetable"
+	icon_state = "largetable";
+	dir = 8
 	},
 /turf/open/floor/carpet/royalblack,
 /area/rogue/under/wretch)
@@ -1506,8 +1506,8 @@
 /area/rogue/under/wretch/temple)
 "pn" = (
 /obj/effect/wisp/prestidigitation{
-	desc = "A small, fiery ball of light made up of mystical energy.";
 	name = "Will-o'-the-wisp";
+	desc = "A small, fiery ball of light made up of mystical energy.";
 	pixel_x = 0
 	},
 /turf/open/floor/rogue/naturalstone,
@@ -1570,9 +1570,9 @@
 /area/rogue/under/wretch)
 "qa" = (
 /obj/structure/closet/crate/roguecloset/inn{
+	pixel_y = 5;
 	keylock = 1;
-	lockid = "sergeant";
-	pixel_y = 5
+	lockid = "sergeant"
 	},
 /obj/item/gun/ballistic/revolver/grenadelauncher/bow,
 /turf/open/floor/rogue/cobblerock,
@@ -1622,8 +1622,8 @@
 /area/rogue/under/wretch)
 "qv" = (
 /obj/effect/decal/edge{
-	color = "#3f3f3f";
-	dir = 8
+	dir = 8;
+	color = "#3f3f3f"
 	},
 /obj/effect/decal/cleanable/debris/stony,
 /turf/open/floor/rogue/blocks/flipped,
@@ -1710,8 +1710,8 @@
 /area/rogue/under/wretch)
 "rn" = (
 /obj/structure/table/wood{
-	dir = 1;
-	icon_state = "longtable"
+	icon_state = "longtable";
+	dir = 1
 	},
 /obj/item/reagent_containers/glass/cup/skull{
 	pixel_x = 3;
@@ -1738,8 +1738,8 @@
 	dir = 8
 	},
 /obj/machinery/light/rogue/campfire/fireplace{
-	pixel_y = 0;
-	pixel_x = -32
+	pixel_x = -32;
+	pixel_y = 0
 	},
 /turf/open/floor/carpet/royalblack,
 /area/rogue/under/wretch)
@@ -1788,8 +1788,8 @@
 	},
 /obj/structure/table/finestone,
 /obj/item/rogueweapon/huntingknife/scissors{
-	pixel_y = 4;
-	pixel_x = 8
+	pixel_x = 8;
+	pixel_y = 4
 	},
 /turf/open/floor/rogue/blocks,
 /area/rogue/under/wretch)
@@ -1799,8 +1799,8 @@
 /area/rogue/outdoors/wretch)
 "sp" = (
 /obj/structure/mineral_door/wood/deadbolt{
-	dir = 8;
-	name = "Peddler"
+	name = "Peddler";
+	dir = 8
 	},
 /turf/open/floor/rogue/ruinedwood,
 /area/rogue/under/wretch)
@@ -1890,8 +1890,8 @@
 /area/rogue/outdoors/wretch)
 "tG" = (
 /obj/structure/fluff/walldeco/serpflag{
-	desc = "Into whatsoever houses I enter, I will enter to help the sick, and I will abstain from all intentional wrong-doing and harm, especially from abusing the bodies of man or woman, bond or free.";
-	name = "krankenhaus banner"
+	name = "krankenhaus banner";
+	desc = "Into whatsoever houses I enter, I will enter to help the sick, and I will abstain from all intentional wrong-doing and harm, especially from abusing the bodies of man or woman, bond or free."
 	},
 /turf/closed/wall/mineral/rogue/stone,
 /area/rogue/under/wretch)
@@ -1948,8 +1948,8 @@
 /area/rogue/under/wretch/cavern)
 "uB" = (
 /obj/structure/fluff/traveltile/wretch{
-	aportalgoesto = "wretchout2";
-	aportalid = "wretchin2"
+	aportalid = "wretchin2";
+	aportalgoesto = "wretchout2"
 	},
 /turf/open/floor/rogue/naturalstone,
 /area/rogue/outdoors/wretch)
@@ -2097,9 +2097,9 @@
 /area/rogue/under/wretch)
 "vS" = (
 /obj/structure/curtain/black{
-	open = 0;
+	icon_state = "curtain-closed";
 	opacity = 1;
-	icon_state = "curtain-closed"
+	open = 0
 	},
 /turf/open/floor/rogue/ruinedwood,
 /area/rogue/under/wretch)
@@ -2127,8 +2127,8 @@
 /area/rogue/under/wretch/temple)
 "wn" = (
 /obj/structure/table/wood{
-	dir = 6;
-	icon_state = "largetable"
+	icon_state = "largetable";
+	dir = 6
 	},
 /turf/open/floor/rogue/herringbone,
 /area/rogue/under/wretch)
@@ -2158,6 +2158,10 @@
 	dir = 8
 	},
 /area/rogue/under/wretch)
+"wO" = (
+/obj/structure/fluff/statue/tdummy,
+/turf/open/floor/rogue/dirt,
+/area/rogue/outdoors/wretch)
 "wQ" = (
 /obj/structure/rack/rogue/shelf/biggest,
 /obj/effect/spawner/lootdrop/roguetown/dungeon/clothing,
@@ -2250,9 +2254,9 @@
 /area/rogue/outdoors/wretch)
 "xK" = (
 /obj/structure/curtain/black{
-	open = 0;
+	icon_state = "curtain-closed";
 	opacity = 1;
-	icon_state = "curtain-closed"
+	open = 0
 	},
 /turf/closed/wall/mineral/rogue/stone/window{
 	icon_state = "stonewindow"
@@ -2370,22 +2374,22 @@
 /obj/effect/decal/cleanable/blood/splatter,
 /obj/structure/flora/roguegrass,
 /obj/effect/wisp/prestidigitation{
-	color = "#ffff00";
-	desc = "A small, fiery ball of light made up of mystical energy.";
-	light_color = "#33ff00";
 	name = "Will-o'-the-wisp";
-	pixel_x = 0
+	desc = "A small, fiery ball of light made up of mystical energy.";
+	pixel_x = 0;
+	color = "#ffff00";
+	light_color = "#33ff00"
 	},
 /turf/open/floor/rogue/grass,
 /area/rogue/outdoors/wretch)
 "yZ" = (
 /obj/effect/decal/edge{
-	color = "#3f3f3f";
-	dir = 1
+	dir = 1;
+	color = "#3f3f3f"
 	},
 /obj/effect/decal/edge{
-	color = "#3f3f3f";
-	dir = 4
+	dir = 4;
+	color = "#3f3f3f"
 	},
 /obj/effect/decal/cleanable/blood/old,
 /turf/open/floor/rogue/blocks,
@@ -2410,11 +2414,11 @@
 "zo" = (
 /obj/structure/flora/roguegrass/water/reeds,
 /obj/effect/wisp/prestidigitation{
-	color = "#ffff00";
-	desc = "A small, fiery ball of light made up of mystical energy.";
-	light_color = "#33ff00";
 	name = "Will-o'-the-wisp";
-	pixel_x = 0
+	desc = "A small, fiery ball of light made up of mystical energy.";
+	pixel_x = 0;
+	color = "#ffff00";
+	light_color = "#33ff00"
 	},
 /turf/open/water/bloody,
 /area/rogue/outdoors/wretch)
@@ -2440,8 +2444,8 @@
 /area/rogue/outdoors/wretch)
 "zA" = (
 /obj/structure/table/wood{
-	dir = 5;
-	icon_state = "largetable"
+	icon_state = "largetable";
+	dir = 5
 	},
 /turf/open/floor/carpet/royalblack,
 /area/rogue/under/wretch)
@@ -2557,7 +2561,7 @@
 "Aj" = (
 /obj/structure/rack/rogue/shelf/biggest,
 /obj/effect/spawner/lootdrop/roguetown/dungeon/tools{
-	loot = list(/obj/item/rogueweapon/shovel = 3, /obj/item/rogueweapon/thresher = 3, /obj/item/flint = 4, /obj/item/rogueweapon/stoneaxe/woodcut = 3, /obj/item/rogueweapon/hammer/iron = 3, /obj/item/rogueweapon/tongs = 3, /obj/item/rogueweapon/pick = 3, /obj/item/rogueweapon/sickle = 3, /obj/item/rogueweapon/huntingknife = 3, /obj/item/rogueweapon/huntingknife/scissors = 3, /obj/item/rogueweapon/hoe = 3)
+	loot = list(/obj/item/rogueweapon/shovel=3, /obj/item/rogueweapon/thresher=3, /obj/item/flint=4, /obj/item/rogueweapon/stoneaxe/woodcut=3, /obj/item/rogueweapon/hammer/iron=3, /obj/item/rogueweapon/tongs=3, /obj/item/rogueweapon/pick=3, /obj/item/rogueweapon/sickle=3, /obj/item/rogueweapon/huntingknife=3, /obj/item/rogueweapon/huntingknife/scissors=3, /obj/item/rogueweapon/hoe=3)
 	},
 /obj/machinery/light/roguestreet/walllamp,
 /turf/open/floor/rogue/blocks{
@@ -2619,18 +2623,18 @@
 /area/rogue/under/wretch/cavern)
 "AP" = (
 /obj/structure/mineral_door/wood/deadbolt{
-	dir = 8;
-	name = "Chirurgeon's Quarters"
+	name = "Chirurgeon's Quarters";
+	dir = 8
 	},
 /turf/open/floor/rogue/ruinedwood/spiral,
 /area/rogue/under/wretch)
 "AW" = (
 /obj/effect/wisp/prestidigitation{
-	color = "#ffff00";
-	desc = "A small, fiery ball of light made up of mystical energy.";
-	light_color = "#33ff00";
 	name = "Will-o'-the-wisp";
-	pixel_x = 0
+	desc = "A small, fiery ball of light made up of mystical energy.";
+	pixel_x = 0;
+	color = "#ffff00";
+	light_color = "#33ff00"
 	},
 /turf/open/floor/rogue/dirt/road,
 /area/rogue/outdoors/wretch)
@@ -2660,10 +2664,10 @@
 /turf/open/transparent/openspace,
 /area/rogue/outdoors/wretch)
 "Bl" = (
-/obj/structure/chair/hotspring_bench/right,
 /mob/living/simple_animal/hostile/retaliate/rogue/trufflepig{
 	name = "Star-Sugar"
 	},
+/obj/structure/chair/hotspring_bench/right,
 /turf/open/floor/rogue/naturalstone,
 /area/rogue/outdoors/wretch)
 "Bq" = (
@@ -2704,8 +2708,8 @@
 "BB" = (
 /obj/effect/decal/cleanable/debris/woody,
 /obj/structure/roguemachine/goldface/copperface{
-	pixel_y = 32;
-	density = 0
+	density = 0;
+	pixel_y = 32
 	},
 /turf/open/floor/rogue/ruinedwood/spiral,
 /area/rogue/under/wretch)
@@ -2716,8 +2720,8 @@
 /area/rogue/under/wretch)
 "BG" = (
 /obj/structure/table/wood{
-	dir = 4;
-	icon_state = "largetable"
+	icon_state = "largetable";
+	dir = 4
 	},
 /obj/item/reagent_containers/glass/cup/skull,
 /turf/open/floor/carpet/royalblack,
@@ -2756,8 +2760,8 @@
 /area/rogue/under/wretch/cavern)
 "BT" = (
 /obj/structure/fluff/customsign{
-	icon_state = "signwrote";
-	name = "DANGER!! GNOLLS!!"
+	name = "DANGER!! GNOLLS!!";
+	icon_state = "signwrote"
 	},
 /turf/open/floor/rogue/dirt,
 /area/rogue/outdoors/wretch)
@@ -2794,12 +2798,12 @@
 /area/rogue)
 "Ce" = (
 /obj/structure/table/church{
-	dir = 1;
-	icon_state = "churchtable_end_alt"
+	icon_state = "churchtable_end_alt";
+	dir = 1
 	},
 /obj/item/clothing/neck/roguetown/psicross/undivided{
-	desc = "An amulet, formerly worn by the Holy See's own influential figures. Stalwart for centuries against the darkness. Both a mark of station and grace.";
 	name = "weathered see amulet";
+	desc = "An amulet, formerly worn by the Holy See's own influential figures. Stalwart for centuries against the darkness. Both a mark of station and grace.";
 	pixel_y = 10
 	},
 /turf/open/floor/rogue/churchrough,
@@ -2816,8 +2820,8 @@
 /area/rogue/under/wretch/cavern)
 "Co" = (
 /obj/structure/fluff/customsign{
-	icon_state = "signwrote";
-	name = "DANGER!! GNOLLS!!"
+	name = "DANGER!! GNOLLS!!";
+	icon_state = "signwrote"
 	},
 /turf/open/floor/rogue/cobblerock,
 /area/rogue/outdoors/wretch)
@@ -2836,8 +2840,8 @@
 /area/rogue/under/wretch/cavern)
 "Cw" = (
 /obj/structure/mineral_door/wood/deadbolt{
-	dir = 1;
-	name = "Castellan's Quarters"
+	name = "Castellan's Quarters";
+	dir = 1
 	},
 /turf/open/floor/rogue/metal/barograte,
 /area/rogue/under/wretch)
@@ -2850,8 +2854,8 @@
 /area/rogue)
 "CE" = (
 /obj/structure/spider/stickyweb{
-	dir = 4;
-	icon_state = "stickyweb2"
+	icon_state = "stickyweb2";
+	dir = 4
 	},
 /turf/open/floor/rogue/cobble,
 /area/rogue/under/wretch/temple)
@@ -2868,8 +2872,8 @@
 /area/rogue/outdoors/wretch)
 "CO" = (
 /obj/structure/mineral_door/wood/deadbolt{
-	dir = 4;
-	name = "Peddler"
+	name = "Peddler";
+	dir = 4
 	},
 /turf/open/floor/rogue/blocks{
 	icon_state = "bluestone"
@@ -3104,8 +3108,8 @@
 /area/rogue/under/wretch/gnollcavern)
 "Fe" = (
 /obj/structure/table/wood{
-	dir = 1;
-	icon_state = "longtable"
+	icon_state = "longtable";
+	dir = 1
 	},
 /obj/structure/globe{
 	pixel_x = 4;
@@ -3119,8 +3123,8 @@
 /area/rogue/outdoors/wretch)
 "Fj" = (
 /obj/structure/bondage/gloryhole{
-	color = "#999091";
-	opacity = 1
+	opacity = 1;
+	color = "#999091"
 	},
 /obj/structure/curtain/brown{
 	icon_state = "curtain-closed";
@@ -3171,8 +3175,8 @@
 /area/rogue/under/wretch/cavern)
 "FI" = (
 /obj/structure/fluff/traveltile/wretch{
-	aportalgoesto = "wretchout1";
-	aportalid = "wretchin1"
+	aportalid = "wretchin1";
+	aportalgoesto = "wretchout1"
 	},
 /turf/open/floor/rogue/naturalstone,
 /area/rogue/outdoors/wretch)
@@ -3267,9 +3271,9 @@
 /area/rogue/under/wretch)
 "Gr" = (
 /obj/structure/curtain/black{
-	open = 0;
+	icon_state = "curtain-closed";
 	opacity = 1;
-	icon_state = "curtain-closed"
+	open = 0
 	},
 /turf/open/floor/rogue/naturalstone,
 /area/rogue/under/wretch/cavern)
@@ -3403,8 +3407,8 @@
 	dir = 10
 	},
 /obj/effect/decal/cobbleedge{
-	dir = 10;
 	icon_state = "cobbleedge-w";
+	dir = 10;
 	pixel_y = 12
 	},
 /turf/open/floor/rogue/dirt/road,
@@ -3524,12 +3528,12 @@
 /area/rogue/outdoors/wretch)
 "Jp" = (
 /obj/effect/decal/edge{
-	color = "#3f3f3f";
-	dir = 1
+	dir = 1;
+	color = "#3f3f3f"
 	},
 /obj/effect/decal/edge{
-	color = "#3f3f3f";
-	dir = 8
+	dir = 8;
+	color = "#3f3f3f"
 	},
 /obj/effect/decal/cleanable/blood/splatter{
 	icon_state = "gib4-old"
@@ -3624,8 +3628,8 @@
 /area/rogue/outdoors/wretch)
 "Kp" = (
 /obj/structure/far_travel{
-	desc = "The everwinter fields of Gehenna beckon you. Anywhere is better than here.\n(Drag your sprite onto this to exit the round!)";
-	name = "Road to Gehenna"
+	name = "Road to Gehenna";
+	desc = "The everwinter fields of Gehenna beckon you. Anywhere is better than here.\n(Drag your sprite onto this to exit the round!)"
 	},
 /turf/open/water/swamp,
 /area/rogue/outdoors/wretch)
@@ -3864,11 +3868,11 @@
 /area/rogue/under/wretch)
 "Mg" = (
 /obj/effect/wisp/prestidigitation{
-	color = "#ffff00";
-	desc = "A small, fiery ball of light made up of mystical energy.";
-	light_color = "#33ff00";
 	name = "Will-o'-the-wisp";
-	pixel_x = 0
+	desc = "A small, fiery ball of light made up of mystical energy.";
+	pixel_x = 0;
+	color = "#ffff00";
+	light_color = "#33ff00"
 	},
 /turf/open/floor/rogue/dirt/road,
 /area/rogue/under/wretch/cavern)
@@ -3959,8 +3963,8 @@
 /obj/structure/curtain/magenta{
 	icon_state = "curtain-closed";
 	opacity = 1;
-	open = 0;
-	color = "#873343"
+	color = "#873343";
+	open = 0
 	},
 /turf/open/floor/rogue/ruinedwood/spiral,
 /area/rogue/under/wretch/cavern)
@@ -4080,8 +4084,8 @@
 /area/rogue/outdoors/wretch)
 "NM" = (
 /obj/effect/decal/edge{
-	color = "#3f3f3f";
-	dir = 8
+	dir = 8;
+	color = "#3f3f3f"
 	},
 /obj/effect/decal/cleanable/blood,
 /turf/open/floor/rogue/cobblerock,
@@ -4089,11 +4093,11 @@
 "NR" = (
 /obj/effect/decal/cleanable/debris/stony,
 /obj/effect/wisp/prestidigitation{
-	color = "#ffff00";
-	desc = "A small, fiery ball of light made up of mystical energy.";
-	light_color = "#33ff00";
 	name = "Will-o'-the-wisp";
-	pixel_x = 0
+	desc = "A small, fiery ball of light made up of mystical energy.";
+	pixel_x = 0;
+	color = "#ffff00";
+	light_color = "#33ff00"
 	},
 /turf/open/floor/rogue/dirt,
 /area/rogue/outdoors/wretch)
@@ -4113,8 +4117,8 @@
 /area/rogue/under/wretch)
 "Oh" = (
 /obj/structure/table/wood{
-	dir = 6;
-	icon_state = "largetable"
+	icon_state = "largetable";
+	dir = 6
 	},
 /turf/open/floor/carpet/royalblack,
 /area/rogue/under/wretch)
@@ -4162,11 +4166,11 @@
 "OM" = (
 /obj/effect/decal/cleanable/blood/splatter,
 /obj/effect/wisp/prestidigitation{
-	color = "#ffff00";
-	desc = "A small, fiery ball of light made up of mystical energy.";
-	light_color = "#33ff00";
 	name = "Will-o'-the-wisp";
-	pixel_x = 0
+	desc = "A small, fiery ball of light made up of mystical energy.";
+	pixel_x = 0;
+	color = "#ffff00";
+	light_color = "#33ff00"
 	},
 /turf/open/floor/rogue/cobble/mossy,
 /area/rogue/under/wretch/gnollcavern)
@@ -4347,11 +4351,11 @@
 /area/rogue/outdoors/wretch)
 "Qu" = (
 /obj/effect/wisp/prestidigitation{
-	color = "#ffff00";
-	desc = "A small, fiery ball of light made up of mystical energy.";
-	light_color = "#33ff00";
 	name = "Will-o'-the-wisp";
-	pixel_x = 0
+	desc = "A small, fiery ball of light made up of mystical energy.";
+	pixel_x = 0;
+	color = "#ffff00";
+	light_color = "#33ff00"
 	},
 /turf/open/floor/rogue/dirt,
 /area/rogue/outdoors/wretch)
@@ -4429,8 +4433,8 @@
 /area/rogue/under/wretch)
 "QW" = (
 /obj/structure/fluff/traveltile/wretch{
-	aportalgoesto = "wretchout1";
-	aportalid = "wretchin1"
+	aportalid = "wretchin1";
+	aportalgoesto = "wretchout1"
 	},
 /turf/open/floor/rogue/cobblerock,
 /area/rogue/outdoors/wretch)
@@ -4452,16 +4456,16 @@
 /area/rogue/under/wretch)
 "Rj" = (
 /obj/structure/curtain/black{
-	open = 0;
+	icon_state = "curtain-closed";
 	opacity = 1;
-	icon_state = "curtain-closed"
+	open = 0
 	},
 /turf/open/floor/rogue/cobble,
 /area/rogue/under/wretch/cavern)
 "Ro" = (
 /obj/effect/decal/edge{
-	color = "#3f3f3f";
-	dir = 1
+	dir = 1;
+	color = "#3f3f3f"
 	},
 /turf/open/floor/rogue/blocks,
 /area/rogue/under/wretch/temple)
@@ -4473,8 +4477,8 @@
 /area/rogue/outdoors/wretch)
 "Rw" = (
 /obj/structure/fluff/traveltile/wretch{
-	aportalgoesto = "wretchtradeout";
-	aportalid = "wretchtradein"
+	aportalid = "wretchtradein";
+	aportalgoesto = "wretchtradeout"
 	},
 /turf/open/floor/rogue/blocks,
 /area/rogue/under/wretch)
@@ -4483,8 +4487,8 @@
 /area/rogue/under/wretch)
 "RF" = (
 /obj/structure/fluff/statue/femalestatue/zizo{
-	desc = "An ancient statue depicting an elven woman.";
 	name = "Ancient Statue";
+	desc = "An ancient statue depicting an elven woman.";
 	pixel_y = 0
 	},
 /turf/open/floor/rogue/concrete,
@@ -4582,8 +4586,8 @@
 /area/rogue/outdoors/wretch)
 "St" = (
 /obj/structure/spider/stickyweb{
-	dir = 8;
-	icon_state = "stickyweb2"
+	icon_state = "stickyweb2";
+	dir = 8
 	},
 /turf/open/floor/rogue/blocks/flipped,
 /area/rogue/under/wretch/temple)
@@ -4598,9 +4602,9 @@
 "Sy" = (
 /obj/structure/stairs/stone,
 /obj/structure/curtain/black{
-	open = 0;
+	icon_state = "curtain-closed";
 	opacity = 1;
-	icon_state = "curtain-closed"
+	open = 0
 	},
 /turf/open/floor/rogue/naturalstone,
 /area/rogue/under/wretch/cavern)
@@ -4850,7 +4854,7 @@
 "UR" = (
 /obj/structure/rack/rogue/shelf/biggest,
 /obj/effect/spawner/lootdrop/roguetown/dungeon/tools{
-	loot = list(/obj/item/rogueweapon/shovel = 3, /obj/item/rogueweapon/thresher = 3, /obj/item/flint = 4, /obj/item/rogueweapon/stoneaxe/woodcut = 3, /obj/item/rogueweapon/hammer/iron = 3, /obj/item/rogueweapon/tongs = 3, /obj/item/rogueweapon/pick = 3, /obj/item/rogueweapon/sickle = 3, /obj/item/rogueweapon/huntingknife = 3, /obj/item/rogueweapon/huntingknife/scissors = 3, /obj/item/rogueweapon/hoe = 3)
+	loot = list(/obj/item/rogueweapon/shovel=3, /obj/item/rogueweapon/thresher=3, /obj/item/flint=4, /obj/item/rogueweapon/stoneaxe/woodcut=3, /obj/item/rogueweapon/hammer/iron=3, /obj/item/rogueweapon/tongs=3, /obj/item/rogueweapon/pick=3, /obj/item/rogueweapon/sickle=3, /obj/item/rogueweapon/huntingknife=3, /obj/item/rogueweapon/huntingknife/scissors=3, /obj/item/rogueweapon/hoe=3)
 	},
 /obj/machinery/light/roguestreet/walllamp{
 	dir = 1
@@ -4905,8 +4909,8 @@
 /area/rogue/under/wretch/cavern)
 "Vk" = (
 /obj/effect/decal/edge{
-	color = "#3f3f3f";
-	dir = 8
+	dir = 8;
+	color = "#3f3f3f"
 	},
 /turf/open/floor/rogue/blocks/flipped,
 /area/rogue/under/wretch/temple)
@@ -5147,8 +5151,8 @@
 /area/rogue/outdoors/wretch)
 "Xk" = (
 /obj/effect/decal/cobbleedge{
-	dir = 1;
-	icon_state = "borderfall"
+	icon_state = "borderfall";
+	dir = 1
 	},
 /obj/structure/fluff/railing/border{
 	dir = 1
@@ -5194,8 +5198,8 @@
 /area/rogue/outdoors/wretch)
 "XK" = (
 /obj/structure/table/wood{
-	dir = 10;
-	icon_state = "largetable"
+	icon_state = "largetable";
+	dir = 10
 	},
 /obj/item/candle/yellow,
 /turf/open/floor/carpet/royalblack,
@@ -5435,8 +5439,8 @@
 /area/rogue/under/wretch/gnollcavern)
 "ZI" = (
 /obj/effect/decal/edge{
-	color = "#3f3f3f";
-	dir = 4
+	dir = 4;
+	color = "#3f3f3f"
 	},
 /turf/open/floor/rogue/cobblerock,
 /area/rogue/under/wretch/temple)
@@ -10123,7 +10127,7 @@ et
 bV
 yH
 bA
-DS
+wO
 UG
 Is
 KE

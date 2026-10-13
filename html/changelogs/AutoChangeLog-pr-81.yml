@@ -1,0 +1,7 @@
+author: "TheMysteriousDragon"
+delete-after: True
+changes:
+  - rscadd: "Added the Celestial Zauberer Staff for Gefechtsgelehrter mercenaries."
+  - image: "Added the new staff sprite."
+  - balance: "Updated the Gefechtsgelehrter's armor, supplies, spells, arcane skill, spellpoints, arcyne tier, and old-age adjustments."
+  - spellcheck: "Updated the Gefechtsgelehrter role and tutorial descriptions."
