@@ -261,6 +261,30 @@
 
 /mob/living/simple_animal/pet/familiar/examine(mob/user)
 	. = ..()
+	var/t_his = p_their()
+	var/t_has = p_have()
+	if(user == src)
+		t_his = "my"
+		t_has = "I have"
+	for(var/slot_id in list(SLOT_HEAD, SLOT_NECK, SLOT_CLOAK, SLOT_BELT, SLOT_BELT_L, SLOT_BELT_R))
+		var/obj/item/equipped_item = get_item_by_slot(slot_id)
+		if(!equipped_item || (equipped_item.item_flags & ABSTRACT))
+			continue
+		var/slot_description
+		switch(slot_id)
+			if(SLOT_HEAD)
+				slot_description = "on [t_his] head"
+			if(SLOT_NECK)
+				slot_description = "around [t_his] neck"
+			if(SLOT_CLOAK)
+				slot_description = "over [t_his] shoulders"
+			if(SLOT_BELT)
+				slot_description = "around [t_his] waist"
+			if(SLOT_BELT_L)
+				slot_description = "at [t_his] left hip"
+			if(SLOT_BELT_R)
+				slot_description = "at [t_his] right hip"
+		. += "[t_has] [equipped_item.get_examine_string(user)] [slot_description]."
 	var/datum/familiar_prefs/fpref = src.client?.prefs.familiar_prefs
 	if(fpref && (fpref.familiar_flavortext || fpref.familiar_headshot_link || fpref.familiar_ooc_notes))
 		. += "<a href='?src=[REF(src)];task=view_fam_headshot;'>Examine closer</a>"
