@@ -743,6 +743,13 @@ GLOBAL_VAR_INIT(mobids, 1)
 		else
 			usr.stripPanelEquip(what,src,slot)
 
+	if(href_list["strip_all"] && usr.canUseTopic(src, BE_CLOSE, NO_DEXTERITY))
+		var/loot_filter = href_list["strip_all"]
+		if(!(loot_filter in list(LOOT_FILTER_ALL, LOOT_FILTER_FABRIC, LOOT_FILTER_SMELT)))
+			return
+		usr.stripPanelUnequipAll(src, loot_filter)
+		return
+
 	if(usr.machine == src)
 		if(Adjacent(usr))
 			show_inv(usr)
@@ -752,6 +759,10 @@ GLOBAL_VAR_INIT(mobids, 1)
 // The src mob is trying to strip an item from someone
 // Defined in living.dm
 /mob/proc/stripPanelUnequip(obj/item/what, mob/who)
+	return
+
+// Bulk stripping for living mobs implemented in living.dm
+/mob/proc/stripPanelUnequipAll(mob/who, loot_filter = LOOT_FILTER_ALL)
 	return
 
 // The src mob is trying to place an item on someone
@@ -1097,7 +1108,7 @@ GLOBAL_VAR_INIT(mobids, 1)
 ///Add a spell to the mobs spell list
 /mob/proc/AddSpell(obj/effect/proc_holder/spell/S)
 	mob_spell_list += S
-	S.action.Grant(src)
+	S.action?.Grant(src)
 
 ///Remove a spell from the mobs spell list
 /mob/proc/RemoveSpell(obj/effect/proc_holder/spell/spell)
@@ -1419,14 +1430,14 @@ GLOBAL_VAR_INIT(mobids, 1)
 
 /mob/proc/adjust_hydration(change)
 	if(HAS_TRAIT(src, TRAIT_NOHUNGER))
-		nutrition = HYDRATION_LEVEL_FULL
+		hydration = HYDRATION_LEVEL_FULL
 	hydration = max(0, hydration + change)
 	if(hydration > HYDRATION_LEVEL_FULL)
 		hydration = HYDRATION_LEVEL_FULL
 
 /mob/proc/set_hydration(change)
 	if(HAS_TRAIT(src, TRAIT_NOHUNGER))
-		nutrition = HYDRATION_LEVEL_FULL
+		hydration = HYDRATION_LEVEL_FULL
 	hydration = max(0, change)
 	if(hydration > HYDRATION_LEVEL_FULL)
 		hydration = HYDRATION_LEVEL_FULL

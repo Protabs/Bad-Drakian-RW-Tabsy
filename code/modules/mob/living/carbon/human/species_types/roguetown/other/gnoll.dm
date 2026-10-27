@@ -21,6 +21,7 @@
 	custom_base_icon = "firepelt"
 	species_traits = list(NO_UNDERWEAR, NO_ORGAN_FEATURES, NO_BODYPART_FEATURES)
 	inherent_traits = list(
+		TRAIT_ORGASM_DENIER,
 		TRAIT_LONGSTRIDER,
 		TRAIT_IGNORESLOWDOWN,
 		TRAIT_IGNOREDAMAGESLOWDOWN,
@@ -43,7 +44,8 @@
 		TRAIT_ZURCH,
 		TRAIT_EXTREME_TEMPERATURE_IMMUNE,
 		TRAIT_UNLYCKERABLE, //Just stop
-		TRAIT_DEATHBYSNUSNU
+		TRAIT_DEATHBYSNUSNU,
+		TRAIT_MASTERFUL_HUNTER
 	)
 	changesource_flags = MIRROR_BADMIN | WABBAJACK | MIRROR_MAGIC | MIRROR_PRIDE | RACE_SWAP | SLIME_EXTRACT
 	inherent_biotypes = MOB_HUMANOID
@@ -65,6 +67,7 @@
 		ORGAN_SLOT_LIVER = /obj/item/organ/liver,
 		ORGAN_SLOT_STOMACH = /obj/item/organ/stomach,
 		ORGAN_SLOT_APPENDIX = /obj/item/organ/appendix,
+		ORGAN_SLOT_GUTS = /obj/item/organ/guts,
 	)
 	languages = list(
 		/datum/language/common,

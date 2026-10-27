@@ -267,7 +267,12 @@ SAVEFILE UPDATING/VERSIONING - 'Simplified', or rather, more coder-friendly ~Car
 	S["erp_visuals"]		>> erp_visuals
 	S["chastenable"]		>> chastenable
 	S["chastity_hardmode"]	>> chastity_hardmode
+	if("quiet_chastity" in S.dir)
+		S["quiet_chastity"] >> quiet_chastity
+	else // Preserve the saved setting from the earlier test branch.
+		S["private_chastity"] >> quiet_chastity
 	S["extreme_erp"]		>> extreme_erp
+	S["accept_oviposition"]	>> accept_oviposition
 	S["edging"]				>> edging
 	S["free_use_default"]	>> free_use_default
 	S["sensitive_brands"] 	>> sensitive_brands
@@ -335,6 +340,7 @@ SAVEFILE UPDATING/VERSIONING - 'Simplified', or rather, more coder-friendly ~Car
 	chatheadshot	= sanitize_integer(chatheadshot, 0, 1, initial(chatheadshot))
 	show_mouseover_role = sanitize_integer(show_mouseover_role, 0, 1, initial(show_mouseover_role))
 	chastity_hardmode = sanitize_integer(chastity_hardmode, CHASTITY_HARDMODE_DISABLED, CHASTITY_HARDMODE_ENABLED, initial(chastity_hardmode))
+	quiet_chastity = sanitize_integer(quiet_chastity, 0, 1, initial(quiet_chastity)) && chastenable
 	max_chat_length = sanitize_integer(max_chat_length, 1, CHAT_MESSAGE_MAX_LENGTH, initial(max_chat_length))
 	see_chat_non_mob	= sanitize_integer(see_chat_non_mob, 0, 1, initial(see_chat_non_mob))
 	tgui_fancy		= sanitize_integer(tgui_fancy, 0, 1, initial(tgui_fancy))
@@ -451,7 +457,9 @@ SAVEFILE UPDATING/VERSIONING - 'Simplified', or rather, more coder-friendly ~Car
 	WRITE_FILE(S["erp_visuals"], erp_visuals)
 	WRITE_FILE(S["chastenable"], chastenable)
 	WRITE_FILE(S["chastity_hardmode"], chastity_hardmode)
+	WRITE_FILE(S["quiet_chastity"], quiet_chastity)
 	WRITE_FILE(S["extreme_erp"], extreme_erp)
+	WRITE_FILE(S["accept_oviposition"], accept_oviposition)
 	WRITE_FILE(S["edging"], edging)
 	WRITE_FILE(S["free_use_default"], free_use_default)
 	WRITE_FILE(S["sensitive_brands"], sensitive_brands)
@@ -606,8 +614,10 @@ SAVEFILE UPDATING/VERSIONING - 'Simplified', or rather, more coder-friendly ~Car
 /datum/preferences/proc/_load_virtue(S)
 	var/virtue_type
 	var/virtuetwo_type
+	var/background_type
 	S["virtue"] >> virtue_type
 	S["virtuetwo"] >> virtuetwo_type
+	S["virtue_background"] >> background_type
 
 	// Only instantiate if valid type path exists, otherwise use none
 	if (virtue_type && ispath(virtue_type))
@@ -619,6 +629,24 @@ SAVEFILE UPDATING/VERSIONING - 'Simplified', or rather, more coder-friendly ~Car
 		virtuetwo = new virtuetwo_type()
 	else
 		virtuetwo = new /datum/virtue/none
+
+	// Backgrounds live in their own slot (see modular_azurepeak/virtues/background.dm). Guarded with
+	// ispath() against the background subtype so an old save that still points at one of the retired
+	// virtue types can't land a non-background datum in this slot.
+	if(background_type && ispath(background_type, /datum/virtue/background))
+		virtue_background = new background_type
+	else
+		virtue_background = new /datum/virtue/background/none
+
+	//Retired stubs (retired.dm) resolve and display, but grant nothing - tell the player so the
+	//"(Retired)" label on their virtue button doesn't sit there silently forever.
+	if(parent)
+		if(virtue.retired)
+			to_chat(parent, span_boldwarning("This character's Virtue '[virtue.name]' has been retired and no longer grants anything - pick a replacement in character setup. Its old role may now be available as a Background."))
+		if(virtuetwo.retired)
+			to_chat(parent, span_boldwarning("This character's Second Virtue '[virtuetwo.name]' has been retired and no longer grants anything - pick a replacement in character setup."))
+		if(virtue_background.retired)
+			to_chat(parent, span_boldwarning("This character's Background '[virtue_background.name]' has been retired and no longer grants anything - pick a replacement in character setup."))
 
 /datum/preferences/proc/_load_quirks(S)
 	var/list/quirk_types
@@ -965,6 +993,12 @@ SAVEFILE UPDATING/VERSIONING - 'Simplified', or rather, more coder-friendly ~Car
 
 	S["flavortext"]			>> flavortext
 	S["ooc_notes"]			>> ooc_notes
+	roleplay_ad = null // Old savefiles and empty slots must not inherit another slot's ad.
+	S["roleplay_ad"] >> roleplay_ad
+	if(!istext(roleplay_ad))
+		roleplay_ad = null
+	else
+		roleplay_ad = copytext(roleplay_ad, 1, MAX_MESSAGE_LEN + 1)
 	S["ooc_extra"]			>> ooc_extra
 	S["ooc_extra_img"]		>> ooc_extra_img
 	S["ooc_extra_img_link"]	>> ooc_extra_img_link
@@ -1194,7 +1228,16 @@ SAVEFILE UPDATING/VERSIONING - 'Simplified', or rather, more coder-friendly ~Car
 	WRITE_FILE(S["selected_patron"]		, preferences_typepath_or_null(selected_patron))
 
 	// Organs
+	var/list/packed_hair = list()
+	for(var/datum/customizer_entry/entry as anything in customizer_entries)
+		if(!istype(entry, /datum/customizer_entry/hair))
+			continue
+		var/datum/customizer_entry/hair/hair_entry = entry
+		packed_hair += hair_entry
+		hair_pack(hair_entry)
 	WRITE_FILE(S["customizer_entries"] , customizer_entries)
+	for(var/datum/customizer_entry/hair/hair_entry as anything in packed_hair)
+		hair_unpack(hair_entry)
 	WRITE_FILE(S["body_markings"] , body_markings)
 	WRITE_FILE(S["descriptor_entries"] , descriptor_entries)
 	WRITE_FILE(S["custom_descriptors"] , custom_descriptors)
@@ -1211,6 +1254,7 @@ SAVEFILE UPDATING/VERSIONING - 'Simplified', or rather, more coder-friendly ~Car
 	WRITE_FILE(S["headshot_link"] , headshot_link)
 	WRITE_FILE(S["flavortext"] , html_decode(flavortext))
 	WRITE_FILE(S["ooc_notes"] , html_decode(ooc_notes))
+	WRITE_FILE(S["roleplay_ad"] , roleplay_ad)
 	WRITE_FILE(S["ooc_extra"] ,	ooc_extra)
 	WRITE_FILE(S["ooc_extra_img"] , ooc_extra_img)
 	WRITE_FILE(S["ooc_extra_img_link"] , ooc_extra_img_link)
@@ -1233,6 +1277,10 @@ SAVEFILE UPDATING/VERSIONING - 'Simplified', or rather, more coder-friendly ~Car
 	if(!virtue2_typepath)
 		virtue2_typepath = /datum/virtue/none
 	WRITE_FILE(S["virtuetwo"], virtue2_typepath)
+	var/background_typepath = preferences_typepath_or_null(virtue_background)
+	if(!background_typepath)
+		background_typepath = /datum/virtue/background/none
+	WRITE_FILE(S["virtue_background"], background_typepath)
 	WRITE_FILE(S["quirks"], get_quirk_typepaths())
 	WRITE_FILE(S["race_bonus"], race_bonus)
 	WRITE_FILE(S["combat_music"], preferences_typepath_or_null(combat_music))

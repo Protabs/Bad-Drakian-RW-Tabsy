@@ -26,6 +26,9 @@
 */
 
 /datum/round_modifier/low_gnolls
+	// Two Gnoll slots are guaranteed without spending the random modifier budget.
+	// Retain this modifier for reference, but exclude it from all normal Chaos levels (0-3).
+	min_chaos = 99
 	name = "Low Gnolls"
 	desc = "The dregs of a bloodbeast pack."
 	cost = 1

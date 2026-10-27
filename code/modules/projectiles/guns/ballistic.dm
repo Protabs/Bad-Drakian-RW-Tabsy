@@ -101,6 +101,10 @@
 	chamber_round()
 	update_icon()
 
+/obj/item/gun/ballistic/Destroy()
+	QDEL_NULL(magazine)
+	return ..()
+
 /obj/item/gun/ballistic/update_icon()
 	if (QDELETED(src))
 		return

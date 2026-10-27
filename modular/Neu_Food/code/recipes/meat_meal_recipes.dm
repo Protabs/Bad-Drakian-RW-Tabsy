@@ -2,7 +2,7 @@
 	name = "Ducal Peppersteak"
 	base_item = /obj/item/reagent_containers/food/snacks/rogue/peppersteak
 	ingredients = list(
-		/obj/item/reagent_containers/food/snacks/grown/garlick/rogue
+		/obj/item/reagent_containers/food/snacks/rogue/veg/garlick_clove
 	)
 	result_type = /obj/item/reagent_containers/food/snacks/rogue/peppersteak/ducal
 	time_per_step = 3 SECONDS
@@ -139,7 +139,7 @@
 	name = "Ducal Bird-Roast"
 	base_item = /obj/item/reagent_containers/food/snacks/rogue/meat/poultry/baked/spiced
 	ingredients = list(
-		/obj/item/reagent_containers/food/snacks/grown/garlick/rogue
+		/obj/item/reagent_containers/food/snacks/rogue/veg/garlick_clove
 	)
 	result_type = /obj/item/reagent_containers/food/snacks/rogue/meat/poultry/baked/spiced/ducal
 	time_per_step = 3 SECONDS

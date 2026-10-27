@@ -10,6 +10,8 @@
 //		emote("deathgasp")
 
 	. = ..()
+	if(stat == DEAD)
+		update_critical_alert()
 
 	for(var/datum/brain_trauma/BT as anything in get_traumas())
 		BT.on_death()

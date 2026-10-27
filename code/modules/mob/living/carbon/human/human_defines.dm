@@ -120,6 +120,8 @@
 	var/has_stubble = TRUE
 
 	var/original_name = null
+	/// Account and original character name, captured before job titles or later renames.
+	var/background_stat_identity
 
 	var/buried = FALSE // Whether the body is buried or not.
 	var/funeral = FALSE // Whether the body has received rites or not.
@@ -132,6 +134,11 @@
 	var/origin = "Unknown"
 	var/flavortext = null
 	var/ooc_notes = null
+	/// Ad and originating save slot; retained on the actual body when preferences switch slots.
+	var/roleplay_ad
+	var/roleplay_ad_slot
+	var/roleplay_ad_owner
+	var/roleplay_ad_is_gnoll = FALSE
 	var/ooc_extra
 	var/ooc_extra_img
 	var/ooc_extra_img_link

@@ -60,10 +60,6 @@
 		to_chat(src, span_danger("I cannot use LOOC while in the lobby. Join the round or observe first."))
 		return
 
-	if(isobserver(mob) && !(holder && istype(mob, /mob/dead/observer/admin)))
-		to_chat(src, span_danger("I cannot use SLOOC while ghosted."))
-		return
-
 	if(!mob)
 		return
 

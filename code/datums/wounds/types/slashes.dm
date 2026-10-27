@@ -113,7 +113,7 @@
 	/// Organs we can disembowel associated with chance to disembowel
 	var/static/list/affected_organs = list(
 		ORGAN_SLOT_STOMACH = 100,
-		ORGAN_SLOT_LIVER = 50,
+		ORGAN_SLOT_GUTS = 100,
 	)
 
 /datum/wound/slash/disembowel/can_stack_with(datum/wound/other)
@@ -335,3 +335,22 @@
 	woundpain = 22
 	sewn_woundpain = 14
 	sew_threshold = 95
+
+/datum/wound/slash/boar_gore
+	name = "tusk shaped wound"
+	check_name = span_userdanger("<B>GUTS</B>")
+	severity = WOUND_SEVERITY_FATAL
+	crit_message = list(
+		"%VICTIM is gored!",
+	)
+	sound_effect = 'sound/combat/crit2.ogg'
+	whp = 100
+	sewn_whp = 35
+	bleed_rate = 10
+	sewn_bleed_rate = 0.8
+	clotting_rate = 0.02
+	sewn_clotting_rate = 0.02
+	clotting_threshold = 10
+	sewn_clotting_threshold = 0.5
+	sew_threshold = 150
+	critical = TRUE

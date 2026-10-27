@@ -250,3 +250,10 @@ tools/MapAtmosFixer/MapAtmosFixer/bin/*
 # DM versions file.
 /tools/build/dm_versions.json
 
+
+
+# Generated .NET build files.
+/tools/CreditsTool/bin/
+/tools/CreditsTool/obj/
+/tools/UnstandardnessTestForDM/UnstandardnessTestForDM/bin/
+/tools/UnstandardnessTestForDM/UnstandardnessTestForDM/obj/

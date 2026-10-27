@@ -13,6 +13,12 @@
 #define INVENTORY_DEPTH		2
 #define STORAGE_VIEW_DEPTH	2
 
+// Bulk stripping is limited to dead NPCs that have never had a player mind.
+#define LOOT_FILTER_ALL "all"
+#define LOOT_FILTER_FABRIC "fabric"
+#define LOOT_FILTER_SMELT "smelt"
+#define STRIP_DELAY_MULT_UNCLAIMED_CORPSE 0.33
+
 //ITEM INVENTORY SLOT BITMASKS
 
 #define ITEM_SLOT_PANTS			(1<<0)
@@ -252,3 +258,6 @@
 #define CAN_CADJUST 1
 #define CADJUSTED 2
 #define CADJUSTED_MORE 3
+
+/// Clothing flags that occlude custom hair pixels.
+#define HAIR_OCCLUDING_FLAGS (HIDEHAIR|HIDEEARS|HIDEFACE|HIDESNOUT)

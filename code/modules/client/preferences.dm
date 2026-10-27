@@ -89,6 +89,10 @@ GLOBAL_LIST_EMPTY(chosen_names)
 	var/datum/statpack/statpack	= new /datum/statpack/wildcard/fated // LETHALSTONE EDIT: the statpack we're giving our char instead of racial bonuses
 	var/datum/virtue/virtue = new /datum/virtue/none // LETHALSTONE EDIT: the virtue we get for not picking a statpack
 	var/datum/virtue/virtuetwo = new /datum/virtue/none
+	// Backgrounds: a virtue-like pick (skills + a starting equipment kit) in its own free slot
+	// alongside virtue/virtuetwo, so nobody has to burn a virtue on "some skills and a kit".
+	// See modular_azurepeak/virtues/background.dm.
+	var/datum/virtue/background/virtue_background = new /datum/virtue/background/none
 	var/list/quirks = list()
 	var/selected_title = "None"
 	var/age = AGE_ADULT						//age of character
@@ -124,7 +128,10 @@ GLOBAL_LIST_EMPTY(chosen_names)
 	var/erp_visuals = TRUE
 	var/chastenable = FALSE
 	var/chastity_hardmode = CHASTITY_HARDMODE_DISABLED
+	/// Mute automatic device sounds and notifications without hiding exposed devices.
+	var/quiet_chastity = FALSE
 	var/extreme_erp = FALSE
+	var/accept_oviposition = FALSE
 	var/edging = FALSE
 	var/free_use_default = FALSE
 	var/sensitive_brands = FALSE
@@ -413,6 +420,7 @@ GLOBAL_LIST_EMPTY(chosen_names)
 	var/flavortext_display
 
 	var/ooc_notes
+	var/roleplay_ad
 
 	var/rumour
 
@@ -443,6 +451,8 @@ GLOBAL_LIST_EMPTY(chosen_names)
 	var/datum/advclass/preview_subclass
 
 	var/preview_erect_state = ERECT_STATE_NONE//toggle pintle floppy, half-chubbed, or full mast on preview dummy.
+	/// Session-only zoom for the character sheet; does not change body size.
+	var/tmp/preview_enlarged = FALSE
 
 	var/tgui_pref = TRUE
 
@@ -568,6 +578,7 @@ GLOBAL_LIST_EMPTY(chosen_names)
 
 			dat += "<td style='width:33%;text-align:right'>"
 			dat += "<a href='?_src_=prefs;preference=keybinds;task=menu'>Keybinds</a>"
+			dat += "<br><a href='?_src_=prefs;preference=toggles'>Toggles</a>"
 			dat += "</td>"
 			dat += "</tr>"
 
@@ -606,12 +617,28 @@ GLOBAL_LIST_EMPTY(chosen_names)
 				dat += "<a href='?_src_=prefs;preference=trait;task=menu'>Configure Quirks</a><br></center>"
 				dat += "<center><b>Current Quirks:</b> [all_quirks.len ? all_quirks.Join(", ") : "None"]</center>"
 
-			// Encapsulating table
-			dat += "<table width = '100%'>"
+			// Reserve the native map's width plus room for browser padding and
+			// its scrollbar. Percentage columns can put text beneath the map.
+			var/preview_column_width = preview_enlarged ? 544 : 204
+			dat += "<table style='width:100%;table-layout:fixed'>"
+			dat += "<colgroup><col><col id='character-preview-column' style='width:[preview_column_width]px'><col></colgroup>"
+			if(preview_enlarged)
+				// Native map sizes use display pixels; HTML uses CSS pixels.
+				// Avoid widening the gap again when Windows/browser scaling is on.
+				dat += {"<script>
+					(function () {
+						function fitPreviewColumn() {
+							var column = document.getElementById('character-preview-column');
+							column.style.width = (544 / (window.devicePixelRatio || 1)) + 'px';
+						}
+						fitPreviewColumn();
+						window.addEventListener('resize', fitPreviewColumn);
+					})();
+				</script>"}
 			// Only one Row
 			dat += "<tr>"
-			// Leftmost Column, 40% width
-			dat += "<td width=40% valign='top'>"
+			// The identity and body columns share the remaining width.
+			dat += "<td valign='top'>"
 
 // 			-----------START OF IDENT TABLE-----------
 			dat += "<h2>Identity</h2>"
@@ -709,6 +736,8 @@ GLOBAL_LIST_EMPTY(chosen_names)
 					virtue = GLOB.virtues[/datum/virtue/none]
 				if(virtuetwo.type in pref_species.restricted_virtues)
 					virtuetwo = GLOB.virtues[/datum/virtue/none]
+				if(virtue_background?.type in pref_species.restricted_virtues)
+					virtue_background = GLOB.virtues[/datum/virtue/background/none]
 			if(length(pref_species.restricted_quirks))
 				for(var/datum/quirk/Q in quirks)
 					if(Q.type in pref_species.restricted_quirks)
@@ -763,9 +792,13 @@ GLOBAL_LIST_EMPTY(chosen_names)
 // 			-----------END OF IDENT TABLE-----------
 
 
-			// Middle dummy Column, 20% width
+			// Middle preview column grows with the enlarged preview.
 			dat += "</td>"
-			dat += "<td width=20% valign='top'>"
+			dat += "<td valign='top'>"
+			// The native map overlays this browser; reserve space for it above
+			// the preview controls so those links remain visible and clickable.
+			var/preview_space = preview_enlarged ? 580 : 260
+			dat += "<div style='height:[preview_space]px'></div>"
 			var/datum/job/highest_pref
 			for(var/job in job_preferences)
 				if(job_preferences[job] > highest_pref)
@@ -782,9 +815,9 @@ GLOBAL_LIST_EMPTY(chosen_names)
 					arousal_preview_label = "Hard"
 				else
 					arousal_preview_label = "None"
-			dat += "<div style='text-align: center'><br>Arousal Preview:<br> <a href='?_src_=prefs;preference=preview_erect_state'>[arousal_preview_label]</a></div>"
-			// Rightmost column, 40% width
-			dat += "<td width=40% valign='top'>"
+			dat += "<div style='text-align: center'><br>Arousal Preview:<br><a href='?_src_=prefs;preference=preview_erect_state'>[arousal_preview_label]</a><br><br>Preview Size:<br><a href='?_src_=prefs;preference=preview_size'>[preview_enlarged ? "3x" : "Default"]</a></div>"
+			// Rightmost body column.
+			dat += "</td><td valign='top'>"
 			dat += "<h2>Body</h2>"
 
 //			-----------START OF BODY TABLE-----------
@@ -830,6 +863,7 @@ GLOBAL_LIST_EMPTY(chosen_names)
 			dat += "<br><b>Song:</b> <a href='?_src_=prefs;preference=ooc_extra;task=input'>Change URL</a>"
 			dat += "<a href='?_src_=prefs;preference=change_title;task=input'>Change Title</a>"
 			dat += "<a href='?_src_=prefs;preference=change_artist;task=input'>Change Artist</a>"
+			dat += "<br><b>Set a Roleplay Ad:</b> <a href='?_src_=prefs;preference=roleplay_ad;task=input'>Change</a>"
 			dat += "<br><b>OOC Extra Image/Video/Gif (Flavor Text):</b> <a href='?_src_=prefs;preference=ooc_extra_img;task=input'>Change</a>"
 			if(ooc_extra_img_link != null)
 				dat += "<br><img src='[ooc_extra_img_link]' width='100px' height='100px'>"
@@ -1121,7 +1155,9 @@ GLOBAL_LIST_EMPTY(chosen_names)
 		dat = list("<center>REGISTER!</center>")
 
 	winshow(user, "preferencess_window", TRUE)
-	winset(user, "preferencess_window", "size=820x850")
+	// Lower the minimum before shrinking back to the original sheet size.
+	winset(user, "preferencess_window", preview_enlarged ? "min-size=1560x850" : "min-size=820x650")
+	winset(user, "preferencess_window", preview_enlarged ? "size=1560x1000" : "size=820x850")
 	winset(user, "preferencess_window", "pos=280,80")
 	var/datum/browser/noclose/popup = new(user, "preferences_browser", "<div align='center'>[used_title]</div>")
 	popup.set_window_options("can_close=0")
@@ -1254,6 +1290,12 @@ GLOBAL_LIST_EMPTY(chosen_names)
 						name += virtuetwo.name
 					else
 						name = virtuetwo.name
+				if(virtue_background?.type in job.virtue_restrictions)
+					if(name)
+						name += ", "
+						name += virtue_background.name
+					else
+						name = virtue_background.name
 				// Check all vices
 				for(var/datum/charflaw/vice in list(vice1, vice2, vice3, vice4, vice5, vice6, charflaw))
 					if(vice?.type in job.vice_restrictions)
@@ -1274,6 +1316,12 @@ GLOBAL_LIST_EMPTY(chosen_names)
 						name += virtuetwo.name
 					else
 						name = virtuetwo.name
+				if(virtue_background?.type in job.virtue_restrictions)
+					if(name)
+						name += ", "
+						name += virtue_background.name
+					else
+						name = virtue_background.name
 				if(!isnull(name))
 					HTML += "<font color='#a59461'>[used_name] (Disallowed by Virtue: [name])</font></td> <td> </td></tr>"
 					continue
@@ -1708,6 +1756,10 @@ Slots: [job.spawn_positions] [job.round_contrib_points ? "RCP: +[job.round_contr
 	else if(href_list["preference"] == "triumph_buy_menu")
 		SStriumphs.startup_triumphs_menu(user.client)
 
+	else if(href_list["preference"] == "toggles")
+		user.client?.toggle_options_menu()
+		return
+
 	else if(href_list["preference"] == "keybinds")
 		switch(href_list["task"])
 			if("close")
@@ -1884,17 +1936,15 @@ Slots: [job.spawn_positions] [job.round_contrib_points ? "RCP: +[job.round_contr
 
 				if("subclassoutfit")
 					var/list/choices = list("None")
-					var/datum/job/highest_pref
-					for(var/job in job_preferences)
-						if(job_preferences[job] > highest_pref)
-							highest_pref = SSjob.GetJob(job)
+					var/datum/job/highest_pref = get_preview_job()
 					if(isnull(highest_pref))
 						to_chat(user, "<b>I don't have a Class set to High!</b>")
-					if(length(highest_pref.job_subclasses))
+					if(length(highest_pref?.job_subclasses))
 						for(var/adv in highest_pref.job_subclasses)
 							var/datum/advclass/advpath = adv
 							var/datum/advclass/advref = SSrole_class_handler.get_advclass_by_name(initial(advpath.name))
-							choices[advref.name] = advref
+							if(advref)
+								choices[advref.name] = advref
 					if(length(choices))
 						var/new_choice = input(user, "Choose an outfit preview:", "Outfit Preview")  as anything in choices|null
 						if(new_choice && new_choice != "None")
@@ -1999,12 +2049,32 @@ Slots: [job.spawn_positions] [job.round_contrib_points ? "RCP: +[job.round_contr
 						taur_type = null
 					else
 						taur_type = taur_selection[new_taur_type]
+					validate_customizer_entries()
 
 					var/obj/item/bodypart/taur/tt = taur_type
 					to_chat(user, span_red("Your character now has [tt ? tt::name : "no taurtype."]."))
 
 				if("origin")
 					open_origin_map(user)
+					return
+
+				// Backgrounds are their own free pick: same list as GLOB.virtues, filtered down to the
+				// background subtypes that are actually pickable for this character.
+				if("background")
+					var/list/background_choices = list()
+					for(var/path as anything in GLOB.virtues)
+						var/datum/virtue/B = GLOB.virtues[path]
+						if(!istype(B, /datum/virtue/background) || istype(B, /datum/virtue/background/none))
+							continue
+						if(!B.name || B.unlisted || B.retired)
+							continue
+						if(length(pref_species.restricted_virtues) && (B.type in pref_species.restricted_virtues))
+							continue
+						background_choices[B.name] = B
+					var/background_choice = tgui_input_list(user, "What was my lyfe before?", "BACKGROUND (LOADOUTS PLACED WITHIN THY STASH)", background_choices)
+					if(background_choice)
+						virtue_background = background_choices[background_choice]
+						to_chat(user, process_virtue_text(virtue_background))
 					return
 
 				if("faith")
@@ -2249,6 +2319,24 @@ Slots: [job.spawn_positions] [job.round_contrib_points ? "RCP: +[job.round_contr
 					var/datum/browser/popup = new(user, "Formatting Help", nwidth = 400, nheight = 450)
 					popup.set_content(dat.Join())
 					popup.open(FALSE)
+				if("roleplay_ad")
+					to_chat(user, span_notice("Your roleplay ad is saved for this character and posted automatically when you spawn. In-game, open OOC > Roleplay Ad (View) to browse ads, or Roleplay Ad (Set) to edit or remove yours for the current round only. To change your saved ad for future rounds, use this character customization menu. Leave this field empty to disable automatic posting."))
+					var/ad_slot = default_slot
+					var/new_ad = tgui_input_text(user, "Describe the roleplay you are looking for. Leave empty to remove your saved ad.", "Roleplay Ad", roleplay_ad, max_length = MAX_MESSAGE_LEN, multiline = TRUE, encode = FALSE, bigmodal = TRUE)
+					if(isnull(new_ad))
+						return
+					if(default_slot != ad_slot)
+						to_chat(user, span_warning("Your character slot changed. Reopen the roleplay ad editor for the character you want to edit."))
+						return
+					new_ad = copytext(new_ad, 1, MAX_MESSAGE_LEN + 1)
+					roleplay_ad = length(trim(new_ad)) ? new_ad : null
+					save_character()
+					if(ishuman(user))
+						var/mob/living/carbon/human/H = user
+						if(!H.roleplay_ad_is_gnoll && H.roleplay_ad_slot == ad_slot && H.roleplay_ad_owner == parent?.ckey)
+							H.roleplay_ad = roleplay_ad
+							H.publish_roleplay_ad()
+					to_chat(user, span_notice(roleplay_ad ? "Roleplay ad saved." : "Saved roleplay ad cleared."))
 				if("flavortext")
 					to_chat(user, "<span class='notice'>["<span class='bold'>Flavortext should not include nonphysical nonsensory attributes such as backstory or the character's internal thoughts.</span>"]</span>")
 					var/new_flavortext = tgui_input_text(user, "Input your character description:", "Flavortext", flavortext, multiline = TRUE,  encode = FALSE, bigmodal = TRUE)
@@ -3133,6 +3221,9 @@ Slots: [job.spawn_positions] [job.round_contrib_points ? "RCP: +[job.round_contr
 					user << browse(null, "window=lobby_window")
 					return
 
+				if("preview_size")
+					preview_enlarged = !preview_enlarged
+
 				if("preview_erect_state")
 					switch(preview_erect_state)
 						if(ERECT_STATE_NONE)
@@ -3252,6 +3343,11 @@ Slots: [job.spawn_positions] [job.round_contrib_points ? "RCP: +[job.round_contr
 
 /datum/preferences/proc/copy_to(mob/living/carbon/human/character, icon_updates = 1, roundstart_checks = TRUE, character_setup = FALSE, antagonist = FALSE, skip_normal_prefs = FALSE)
 	if(skip_normal_prefs)
+		// Gnoll ads use the separate gnoll preferences, never the normal slot's ad.
+		character.roleplay_ad = gnoll_prefs?.roleplay_ad
+		character.roleplay_ad_slot = default_slot
+		character.roleplay_ad_owner = parent?.ckey
+		character.roleplay_ad_is_gnoll = TRUE
 		// For gnolls spawning from a non-gnoll base slot, we must not apply any base-slot state.
 		// Set species to gnoll immediately so advclass check_requirements can read dna.species.type.
 		character.set_species(/datum/species/gnoll, icon_update = FALSE)
@@ -3320,6 +3416,8 @@ Slots: [job.spawn_positions] [job.round_contrib_points ? "RCP: +[job.round_contr
 	else
 		character.real_name = real_name
 	character.name = character.real_name
+	if(!character_setup)
+		character.set_background_stat_identity(parent?.ckey, real_name)
 
 	if((selected_title != "None" && pref_species.use_titles) && selected_title != null)
 		character.dna.species.name = selected_title
@@ -3396,6 +3494,10 @@ Slots: [job.spawn_positions] [job.round_contrib_points ? "RCP: +[job.round_contr
 	character.flavortext = flavortext
 
 	character.ooc_notes = ooc_notes
+	character.roleplay_ad_is_gnoll = FALSE
+	character.roleplay_ad = roleplay_ad
+	character.roleplay_ad_slot = default_slot
+	character.roleplay_ad_owner = parent?.ckey
 
 	// Rumours / Noble gossip
 	character.rumour = rumour
@@ -3565,10 +3667,13 @@ Slots: [job.spawn_positions] [job.round_contrib_points ? "RCP: +[job.round_contr
 
 /datum/preferences/proc/process_virtue_text(datum/virtue/V)
 	var/dat
+	var/is_background = istype(V, /datum/virtue/background)
 	if(V.desc)
 		dat += "<font size = 3>[span_purple(V.desc)]</font><br>"
+	if(V.background_desc)
+		dat += "<font size = 3>[span_purple(V.background_desc)]</font><br>"
 	if(length(V.added_skills))
-		dat += "<font color = '#a3e2ff'><font size = 3>This Virtue adds the following skills: <br>"
+		dat += "<font color = '#a3e2ff'><font size = 3>This [is_background ? "Background" : "Virtue"] adds the following skills: <br>"
 		for(var/list/L in V.added_skills)
 			var/name
 			if(ispath(L[1],/datum/skill))
@@ -3577,17 +3682,17 @@ Slots: [job.spawn_positions] [job.round_contrib_points ? "RCP: +[job.round_contr
 			dat += "["\Roman[L[2]]"] level[L[2] > 1 ? "s" : ""] of <b>[name]</b>[L[3] ? ", up to <b>[SSskills.level_names_plain[L[3]]]</b>" : ""] <br>"
 		dat += "</font>"
 	if(length(V.added_traits))
-		dat += "<font color = '#a3ffe0'><font size = 3>This Virtue grants the following traits: <br>"
+		dat += "<font color = '#a3ffe0'><font size = 3>This [is_background ? "Background" : "Virtue"] grants the following traits: <br>"
 		for(var/TR in V.added_traits)
 			dat += "[TR] — <font size = 2>[GLOB.roguetraits[TR]]</font><br>"
 		dat += "</font>"
 	if(length(V.added_stashed_items))
-		dat += "<font color = '#eeffa3'><font size = 3>This Virtue adds the following items to your stash: <br>"
+		dat += "<font color = '#eeffa3'><font size = 3>This [is_background ? "Background" : "Virtue"] adds the following items to your stash: <br>"
 		for(var/I in V.added_stashed_items)
 			dat += "<i>[I]</i> <br>"
 		dat += "</font>"
 	if(V.custom_text)
-		dat += "<font color = '#ffffff'><font size = 3>This Virtue has this special behaviour: <br>"
+		dat += "<font color = '#ffffff'><font size = 3>This [is_background ? "Background" : "Virtue"] has this special behaviour: <br>"
 		dat += "[V.custom_text]"
 		dat += "</font>"
 	return dat

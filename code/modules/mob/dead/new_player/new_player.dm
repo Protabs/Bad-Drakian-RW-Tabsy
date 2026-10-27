@@ -720,6 +720,7 @@ GLOBAL_LIST_INIT(roleplay_readme, world.file2list("strings/rt/rp_prompt.txt"))
 			for(var/job in available_jobs)
 				var/datum/job/job_datum = SSjob.name_occupations[job]
 				var/do_elaborate = job_datum.has_limited_subclasses()
+				var/incompatible_href = length(job_datum.get_blocked_subclasses(client)) ? "<a href='?src=[REF(job_datum)];jobadvincomp=1'><b><font color = '#df1919'>(!!)</font></b></a>" : ""
 				if(job_datum)
 					var/command_bold = FALSE
 					if(job in GLOB.noble_positions)
@@ -730,7 +731,7 @@ GLOBAL_LIST_INIT(roleplay_readme, world.file2list("strings/rt/rp_prompt.txt"))
 					if(job_datum in SSjob.prioritized_jobs)
 						dat += "<a class='job[command_bold]' href='byond://?src=[REF(src)];SelectedJob=[job_datum.title]'><span class='priority'>[used_name] ([job_datum.current_positions])</span></a>"
 					else
-						dat += "<font size = 3>[do_elaborate ? "<a href='?src=[REF(job_datum)];jobsubclassinfo=1'><b><font color = '#6b6743'>(!)</font></b></a>" : ""]<a href='byond://?src=[REF(src)];SelectedJob=[job_datum.title]'>[command_bold ? "<b>" : ""][used_name] ([job_datum.current_positions]/[job_datum.total_positions])[command_bold ? "</b>" : ""]</a></font>"
+						dat += "<font size = 3>[incompatible_href][do_elaborate ? "<a href='?src=[REF(job_datum)];jobsubclassinfo=1'><b><font color = '#6b6743'>(!)</font></b></a>" : ""]<a href='byond://?src=[REF(src)];SelectedJob=[job_datum.title]'>[command_bold ? "<b>" : ""][used_name] ([job_datum.current_positions]/[job_datum.total_positions])[command_bold ? "</b>" : ""]</a></font>"
 						dat += "<br>"
 
 			dat += "</fieldset><br>"
@@ -806,6 +807,12 @@ GLOBAL_LIST_INIT(roleplay_readme, world.file2list("strings/rt/rp_prompt.txt"))
 		if(joined_area)
 			joined_area.on_joining_game(new_character)
 		new_character.update_fov_angles()
+		if(ishuman(new_character))
+			var/mob/living/carbon/human/H = new_character
+			H.publish_roleplay_ad(FALSE)
+			// Automatic posting is silent; the character-creation editor already explains the feature.
+			// if(H.roleplay_ad)
+			//	to_chat(H, span_notice("Your saved roleplay ad has been posted. Open OOC > Roleplay Ad (View) to browse ads, or Roleplay Ad (Set) to edit or remove yours."))
 		new_character = null
 		qdel(src)
 

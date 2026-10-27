@@ -1,4 +1,0 @@
-author: "ProbablyCarl"
-delete-after: True
-changes:
-  - balance: "Pretty now provides -1 stress reduction in inspect. The timer has also been raised to two minutes, from one."

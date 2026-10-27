@@ -24,8 +24,21 @@
 /client/proc/view_roleplay_ads()
 	var/dat
 	for(var/X in GLOB.roleplay_ads)
-		dat += "[GLOB.roleplay_ads[X]]"
+		dat += "[GLOB.roleplay_ads[X]]<br>"
 
 	var/datum/browser/popup = new(src, "actors", "<center>Roleplay Ads</center>", 500, 600)
 	popup.set_content(dat)
 	popup.open(FALSE)
+
+/// Shared formatting keeps saved and manually posted ads linked to the same examine panel.
+/mob/living/carbon/human/proc/publish_roleplay_ad(notify_viewers = TRUE)
+	if(!length(roleplay_ad))
+		LAZYREMOVE(GLOB.roleplay_ads, mobid)
+		return
+	var/ad_text = replacetext(html_encode(roleplay_ad), "\n", "<br>")
+	LAZYSET(GLOB.roleplay_ads, mobid, "<b><a href='?src=[REF(src)];task=view_headshot'>[html_encode(real_name)]</a></b> - [ad_text]<br>")
+	if(notify_viewers)
+		for(var/client/advertisee in GLOB.clients)
+			if(advertisee == client || !(advertisee.prefs.toggles & ROLEPLAY_ADS))
+				continue
+			to_chat(advertisee, "<span class='notice' style='font-size: 90%;'>[html_encode(real_name)] has set a roleplay ad.</span>")

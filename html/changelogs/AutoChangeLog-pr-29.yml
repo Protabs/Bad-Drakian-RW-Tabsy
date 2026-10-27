@@ -1,4 +1,0 @@
-author: "ProbablyCarl"
-delete-after: True
-changes:
-  - bugfix: "Nukes wallclock exploit."

@@ -1,4 +1,0 @@
-author: "ProbablyCarl"
-delete-after: True
-changes:
-  - rscadd: "Hazardous water tiles, for later mapping use, introduced. These are not currently mapped."

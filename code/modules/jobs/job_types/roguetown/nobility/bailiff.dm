@@ -44,6 +44,7 @@
 	wrists = /obj/item/clothing/wrists/roguetown/bracers
 	id = /obj/item/scomstone/garrison
 	backpack_contents = list(
+		/obj/item/storage/keyring/sheriff = 1,
 		/obj/item/rogueweapon/huntingknife/idagger/steel/special = 1,
 		/obj/item/rogueweapon/scabbard/sheath/royal = 1,
 		/obj/item/reagent_containers/glass/bottle/rogue/healthpot = 1,
@@ -86,7 +87,6 @@
 	backr = /obj/item/rogueweapon/mace/cudgel/justice
 	belt = /obj/item/storage/belt/rogue/leather/plaquegold
 	beltr = /obj/item/storage/belt/rogue/pouch/coins/rich
-	beltl = /obj/item/storage/keyring/sheriff
 	head = /obj/item/clothing/head/roguetown/chaperon/noble/bailiff
 
 /datum/advclass/marshal/kcommander
@@ -123,7 +123,7 @@
 	backr = /obj/item/rogueweapon/sword/long/oathkeeper
 	belt = /obj/item/storage/belt/rogue/leather
 	beltr = /obj/item/storage/belt/rogue/pouch/coins/rich
-	beltl = /obj/item/storage/keyring/sheriff
+	beltl = /obj/item/rogueweapon/scabbard/sword/royal
 
 /mob/living/carbon/human/proc/request_law()
 	set name = "Request Law"

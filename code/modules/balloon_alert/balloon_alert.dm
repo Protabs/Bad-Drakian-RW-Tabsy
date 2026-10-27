@@ -1,4 +1,6 @@
 #define BALLOON_TEXT_WIDTH 200
+#define BALLOON_STACK_SPACING 12
+#define BALLOON_STACK_MAX 5
 #define BALLOON_TEXT_SPAWN_TIME (0.2 SECONDS)
 #define BALLOON_TEXT_FADE_TIME (0.1 SECONDS)
 #define BALLOON_TEXT_FULLY_VISIBLE_TIME (0.7 SECONDS)
@@ -26,7 +28,8 @@
 	SHOULD_NOT_SLEEP(TRUE)
 
 	var/list/hearers = get_hearers_in_view(vision_distance, src, RECURSIVE_CONTENTS_CLIENT_MOBS)
-	hearers -= ignored_mobs
+	if(ignored_mobs)
+		hearers -= ignored_mobs
 
 	for (var/mob/hearer in hearers)
 		if (is_blind(hearer))
@@ -47,6 +50,11 @@
 	if(!(viewer_client.prefs.floating_text_toggles & FLOATING_TEXT))
 		return
 
+	if(viewer_client.active_balloon_count >= BALLOON_STACK_MAX)
+		return
+	var/stack_offset = viewer_client.active_balloon_count * BALLOON_STACK_SPACING
+	viewer_client.active_balloon_count++
+
 	var/image/balloon_alert = image(loc = isturf(src) ? src : get_atom_on_turf(src), layer = ABOVE_MOB_LAYER)
 	balloon_alert.plane = BALLOON_CHAT_PLANE
 	balloon_alert.appearance_flags = RESET_ALPHA|RESET_COLOR|RESET_TRANSFORM
@@ -60,17 +68,18 @@
 	var/length_mult = 1 + max(0, length(strip_html_simple(text)) - BALLOON_TEXT_CHAR_LIFETIME_INCREASE_MIN) * BALLOON_TEXT_CHAR_LIFETIME_INCREASE_MULT
 
 	if(!y_offset)
+		balloon_alert.pixel_y = stack_offset
 		animate(
 			balloon_alert,
-			pixel_y = ICON_SIZE_Y * 1.2,
+			pixel_y = stack_offset + ICON_SIZE_Y * 1.2,
 			time = BALLOON_TEXT_TOTAL_LIFETIME(length_mult),
 			easing = SINE_EASING | EASE_OUT,
 		)
 	else
-		balloon_alert.pixel_y = y_offset
+		balloon_alert.pixel_y = y_offset + stack_offset
 		animate(
 			balloon_alert,
-			pixel_y = y_offset + 5,
+			pixel_y = y_offset + stack_offset + 5,
 			time = BALLOON_TEXT_TOTAL_LIFETIME(length_mult),
 			easing = SINE_EASING | EASE_OUT,
 		)
@@ -92,7 +101,7 @@
 	// These two timers are not the same
 	// One manages the relation to the atom that spawned us, the other to the client we're displaying to
 	// We could lose our loc, and still need to talk to our client, so they are done seperately
-	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(remove_image_from_client), balloon_alert, viewer_client), BALLOON_TEXT_TOTAL_LIFETIME(length_mult))
+	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(remove_balloon_from_client), balloon_alert, viewer_client), BALLOON_TEXT_TOTAL_LIFETIME(length_mult))
 
 //These are "standard" separations for 3 tiers. Should work fine with single words.
 #define BALLOON_Y_OFFSET_TIER1 5
@@ -100,7 +109,7 @@
 #define BALLOON_Y_OFFSET_TIER3 25
 
 ///Proc for creating a balloon alert that only someone with a specific trait would see.
-/atom/proc/filtered_balloon_alert(trait, text, x_offset, y_offset)
+/atom/proc/filtered_balloon_alert(trait, text, x_offset, y_offset, show_self = TRUE)
 	var/list/candidates = get_hearers_in_view(DEFAULT_MESSAGE_RANGE, src, RECURSIVE_CONTENTS_CLIENT_MOBS)
 	if(trait)	
 		for(var/mob/living/carbon/human/H in candidates)
@@ -109,8 +118,26 @@
 	else
 		CRASH("filtered_balloon_alert called without a trait, either it's an error or use balloon_alert instead.")
 
+	if(!show_self)
+		candidates |= src // candidates are ignored recipients, so add the source to exclude it.
+
 	balloon_alert_to_viewers(text, null, DEFAULT_MESSAGE_RANGE, candidates, x_offset, y_offset)
 
+
+/// Alerts medicine-qualified human viewers, optionally also accepting a specific trait.
+/atom/proc/skill_filtered_balloon_alert(skill_path, required_level, text, x_offset, y_offset, show_self = TRUE, or_trait)
+	if(!skill_path)
+		CRASH("skill_filtered_balloon_alert called without a skill path.")
+	var/list/ignored_mobs = get_hearers_in_view(DEFAULT_MESSAGE_RANGE, src, RECURSIVE_CONTENTS_CLIENT_MOBS)
+	for(var/mob/living/carbon/human/H in ignored_mobs.Copy())
+		if(!show_self && H == src)
+			continue
+		if(H.get_skill_level(skill_path) >= required_level || (or_trait && HAS_TRAIT(H, or_trait)))
+			ignored_mobs -= H
+	balloon_alert_to_viewers(text, null, DEFAULT_MESSAGE_RANGE, ignored_mobs, x_offset, y_offset)
+
+#undef BALLOON_STACK_SPACING
+#undef BALLOON_STACK_MAX
 #undef BALLOON_TEXT_CHAR_LIFETIME_INCREASE_MIN
 #undef BALLOON_TEXT_CHAR_LIFETIME_INCREASE_MULT
 #undef BALLOON_TEXT_FADE_TIME

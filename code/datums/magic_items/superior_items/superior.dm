@@ -65,18 +65,31 @@
 	. = ..()
 	if(slot == ITEM_SLOT_HANDS)
 		return
+	if(HAS_TRAIT(user, TRAIT_SILVER_WEAK))
+		to_chat(user, span_warning("My silver weakness prevents this enchantment from protecting me against fire."))
+		return
 	if(active_item)
 		return
 	else
 		active_item = TRUE
+		RegisterSignal(user, SIGNAL_ADDTRAIT(TRAIT_SILVER_WEAK), PROC_REF(on_silver_weakness))
 		ADD_TRAIT(user, TRAIT_NOFIRE, "[type]")
 		to_chat(user, span_notice("I feel fire-resistant!"))
 
 /datum/magic_item/superior/fireresist/on_drop(obj/item/i, mob/living/user)
+	UnregisterSignal(user, SIGNAL_ADDTRAIT(TRAIT_SILVER_WEAK))
 	if(active_item)
 		active_item = FALSE
 		REMOVE_TRAIT(user, TRAIT_NOFIRE, "[type]")
 		to_chat(user, span_notice("I feel mundane once more"))
+
+/datum/magic_item/superior/fireresist/proc/on_silver_weakness(mob/living/user)
+	SIGNAL_HANDLER
+	UnregisterSignal(user, SIGNAL_ADDTRAIT(TRAIT_SILVER_WEAK))
+	active_item = FALSE
+	if(HAS_TRAIT_FROM(user, TRAIT_NOFIRE, "[type]"))
+		REMOVE_TRAIT(user, TRAIT_NOFIRE, "[type]")
+		to_chat(user, span_warning("My silver weakness prevents this enchantment from protecting me against fire."))
 
 /datum/magic_item/superior/climbing
 	name = "spider's movement"

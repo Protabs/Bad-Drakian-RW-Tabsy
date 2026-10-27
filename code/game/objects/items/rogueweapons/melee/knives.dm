@@ -129,8 +129,8 @@
 	edelay_type = 1
 	is_tool = TRUE
 
-	//flipping knives has a cooldown on to_chat to reduce chatspam
-	COOLDOWN_DECLARE(flip_cooldown)
+	twirly = SKILL_LEVEL_JOURNEYMAN
+	twirl_verb = "flip"
 
 /obj/item/rogueweapon/huntingknife/getonmobprop(tag)
 	. = ..()
@@ -141,39 +141,9 @@
 			if("onbelt")
 				return list("shrink" = 0.3,"sx" = -2,"sy" = -5,"nx" = 4,"ny" = -5,"wx" = 0,"wy" = -5,"ex" = 2,"ey" = -5,"nturn" = 0,"sturn" = 0,"wturn" = 0,"eturn" = 0,"nflip" = 0,"sflip" = 0,"wflip" = 0,"eflip" = 0,"northabove" = 0,"southabove" = 1,"eastabove" = 1,"westabove" = 0)
 
-/obj/item/rogueweapon/huntingknife/rmb_self(mob/user)
-	. = ..()
-	if(.)
-		return
-
-	SpinAnimation(4, 2) // The spin happens regardless of the cooldown
-
-	if(!COOLDOWN_FINISHED(src, flip_cooldown))
-		return
-
-	COOLDOWN_START(src, flip_cooldown, 3 SECONDS)
-	if((user.get_skill_level(/datum/skill/combat/knives) < 3) && prob(40))
-		user.visible_message(
-			span_danger("While trying to flip [src] [user] drops it instead!"),
-			span_userdanger("While trying to flip [src] you drop it instead!"),
-		)
-		var/mob/living/carbon/human/unfortunate_idiot = user
-		var/dropped_knife_target = pick(
-			BODY_ZONE_PRECISE_L_FOOT,
-			BODY_ZONE_PRECISE_R_FOOT,
-			)
-		unfortunate_idiot.apply_damage(src.force, BRUTE, dropped_knife_target)
-		user.dropItemToGround(src, TRUE)
-	else
-		user.visible_message(
-			span_notice("[user] spins [src] around [user.p_their()] finger"),
-			span_notice("You spin [src] around your finger"),
-		)
-		playsound(src, 'sound/foley/equip/swordsmall1.ogg', 20, FALSE)
-
-	return
-
-
+/obj/item/rogueweapon/huntingknife/twirl_success(mob/living/user)
+	user.visible_message(span_notice("[user] spins [src] around [user.p_their()] finger."), span_notice("You spin [src] around your finger."))
+	playsound(src, twirl_sound, 20, FALSE)
 
 /obj/item/rogueweapon/huntingknife/copper
 	name = "copper knife"
@@ -792,84 +762,6 @@
 	)
 	sellprice += 200
 
-/obj/item/weapon/knife/dagger/silver/arcyne
-	name = "glowing purple silver dagger"
-	desc = "This dagger glows a faint purple. Quicksilver runs across its blade."
-	var/is_bled = FALSE
-	picklvl = 1.1
-	smeltresult = null
-
-/obj/item/weapon/knife/dagger/silver/arcyne/Initialize(mapload)
-	. = ..()
-	filter(type="drop_shadow", x=0, y=0, size=2, offset=1, color=rgb(128, 0, 128, 1))
-
-/obj/item/weapon/knife/dagger/silver/attackby(obj/item/M, mob/user, params)
-	if(istype(M,/obj/item/rogueore/cinnabar))
-		var/crafttime = (60 - ((user.get_skill_level(/datum/skill/magic/arcane)) * 5))
-		if(do_after(user, crafttime, target = src))
-			playsound(loc, 'sound/magic/scrapeblade.ogg', 100, TRUE)
-			to_chat(user, span_notice("I press acryne magic into the blade and it throbs in a deep purple..."))
-			var/obj/arcyne_knife = new /obj/item/weapon/knife/dagger/silver/arcyne
-			qdel(M)
-			qdel(src)
-			user.put_in_active_hand(arcyne_knife)
-	else
-		return ..()
-
-/obj/item/weapon/knife/dagger/silver/arcyne/attack_self(mob/living/carbon/human/user)
-	if(!isarcyne(user))
-		return
-	var/obj/effect/decal/cleanable/roguerune/pickrune
-	var/runenameinput = input(user, "Runes", "All Runes") as null|anything in GLOB.t4rune_types
-	pickrune = GLOB.rune_types[runenameinput]
-	if(!pickrune)
-		return
-	var/turf/Turf = get_turf(user)
-	if(locate(/obj/effect/decal/cleanable/roguerune) in Turf)
-		to_chat(user, span_cult("There is already a rune here."))
-		return
-	var/structures_in_way = check_for_structures_and_closed_turfs(loc, pickrune)
-	if(structures_in_way == TRUE)
-		to_chat(user, span_cult("There is a structure, rune or wall in the way."))
-		return
-	var/chosen_keyword
-	if(pickrune.req_keyword)
-		chosen_keyword = stripped_input(user, "Keyword for the new rune", "Runes", max_length = MAX_NAME_LEN)
-		if(!chosen_keyword)
-			return FALSE
-	if(!is_bled)
-		playsound(loc, get_sfx("genslash"), 100, TRUE)
-		user.visible_message(span_warning("[user] cuts open [user.p_their()] palm!"), \
-			span_cult("I slice open my palm!"))
-		if(user.get_blood_volume())
-			user.apply_damage(pickrune.scribe_damage, BRUTE, pick(BODY_ZONE_L_ARM, BODY_ZONE_R_ARM))
-		is_bled = TRUE
-	var/crafttime = (10 SECONDS - ((user.get_skill_level(/datum/skill/magic/arcane)) * 5))
-
-	user.visible_message(span_warning("[user] begins to carve something with [user.p_their()] blade!"), \
-		span_notice("I start to drag the blade in the shape of symbols and sigils."))
-	playsound(loc, 'sound/magic/bladescrape.ogg', 100, TRUE)
-	if(do_after(user, crafttime, target = src))
-		if(QDELETED(src) || !pickrune)
-			return
-		user.visible_message(span_warning("[user] carves an arcyne rune with [user.p_their()] [src]!"), \
-		span_notice("I finish dragging the blade in symbols and circles, leaving behind a [pickrune.name]."))
-		new pickrune(Turf, chosen_keyword)
-
-/obj/item/weapon/knife/dagger/proc/check_for_structures_and_closed_turfs(loc, obj/effect/decal/cleanable/roguerune/rune_to_scribe)
-	for(var/turf/T in range(loc, rune_to_scribe.runesize))
-		//check for /sturcture subtypes in the turf's contents
-		for(var/obj/structure/S in T.contents)
-			return TRUE		//Found a structure, no need to continue
-		//check if turf itself is a /turf/closed subtype
-		if(istype(T,/turf/closed))
-			return TRUE
-		//check if rune in the turfs contents
-		for(var/obj/effect/decal/cleanable/roguerune/R in T.contents)
-			return TRUE
-		//Return false if nothing in range was found
-	return FALSE
-
 /obj/item/rogueweapon/huntingknife/stoneknife
 	possible_item_intents = list(/datum/intent/dagger/cut,/datum/intent/dagger/chop)
 	name = "stone knife"
@@ -937,6 +829,7 @@
 	playsound(src.loc, 'sound/blank.ogg', 50, TRUE)
 	if(extended)
 		force = 20
+		force_dynamic = 20
 		wdefense = 6
 		wdefense_dynamic = 6
 		w_class = WEIGHT_CLASS_NORMAL
@@ -950,6 +843,7 @@
 		inv_storage_delay = initial(inv_storage_delay)
 	else
 		force = 5
+		force_dynamic = 5
 		w_class = WEIGHT_CLASS_SMALL
 		throwforce = 5
 		icon_state = "navaja_c"

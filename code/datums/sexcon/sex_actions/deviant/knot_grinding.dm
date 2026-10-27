@@ -58,7 +58,9 @@
 		if(SEX_PART_JAWS)
 			pleasure_target = 0
 			zone_text = "mouth"
-			recipient.adjustOxyLoss(3) // we're choking the orally knotted recipient
+			// Original direct damage call retained for rollback; use panel resistance instead.
+			// recipient.adjustOxyLoss(3) // we're choking the orally knotted recipient
+			recipient.adjust_panel_oxygen_loss(3) // use the recipient's panel-specific resistance
 		if(SEX_PART_SLIT_SHEATH)
 			pleasure_target = 2
 			zone_text = "sheath"

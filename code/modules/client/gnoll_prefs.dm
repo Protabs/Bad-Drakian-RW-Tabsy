@@ -20,6 +20,7 @@
 	var/headshot_link
 	var/flavortext
 	var/ooc_notes
+	var/roleplay_ad
 	var/ooc_extra
 	var/ooc_extra_img
 	var/ooc_extra_img_link
@@ -320,6 +321,7 @@
 	dat += "<br><b>Song:</b> <a href='?_src_=gnoll_prefs;action=ooc_extra'>Change URL</a>"
 	dat += "<a href='?_src_=gnoll_prefs;action=change_title'>Change Title</a>"
 	dat += "<a href='?_src_=gnoll_prefs;action=change_artist'>Change Artist</a>"
+	dat += "<br><b>Set a Roleplay Ad:</b> <a href='?_src_=gnoll_prefs;action=roleplay_ad'>Change</a>"
 	dat += "<br><b>OOC Extra Image/Video/Gif (Flavor Text):</b> <a href='?_src_=gnoll_prefs;action=ooc_extra_img'>Change</a>"
 	if(ooc_extra_img_link != null)
 		dat += "<br><img src='[ooc_extra_img_link]' width='100px' height='100px'>"
@@ -538,6 +540,26 @@
 			var/datum/browser/popup = new(user, "Formatting Help", nwidth = 400, nheight = 350)
 			popup.set_content(dat.Join())
 			popup.open(FALSE)
+		if("roleplay_ad")
+			to_chat(user, span_notice("Your gnoll roleplay ad is saved separately from your normal character's ad and posted automatically when you spawn as a gnoll. Open OOC > Roleplay Ad (View) in-game to browse ads, or Roleplay Ad (Set) to edit or remove yours for the current round only. To change your saved gnoll ad for future rounds, use this Gnoll Customization menu. Leave empty to disable automatic posting."))
+			var/datum/preferences/P = user.client.prefs
+			var/ad_slot = P.default_slot
+			var/new_ad = tgui_input_text(user, "Describe the roleplay you are looking for as your gnoll. Leave empty to remove the saved ad.", "Gnoll Roleplay Ad", roleplay_ad, max_length = MAX_MESSAGE_LEN, multiline = TRUE, encode = FALSE, bigmodal = TRUE)
+			if(isnull(new_ad))
+				return
+			if(P.default_slot != ad_slot || P.gnoll_prefs != src)
+				to_chat(user, span_warning("Your character slot changed. Reopen Gnoll Customization to edit its ad."))
+				return
+			new_ad = copytext(new_ad, 1, MAX_MESSAGE_LEN + 1)
+			roleplay_ad = length(trim(new_ad)) ? new_ad : null
+			P.save_character()
+			if(ishuman(user))
+				var/mob/living/carbon/human/H = user
+				if(H.roleplay_ad_is_gnoll && H.roleplay_ad_slot == ad_slot && H.roleplay_ad_owner == P.parent?.ckey)
+					H.roleplay_ad = roleplay_ad
+					H.publish_roleplay_ad()
+			to_chat(user, span_notice(roleplay_ad ? "Gnoll roleplay ad saved." : "Saved gnoll roleplay ad cleared."))
+			gnoll_show_ui(user)
 		if("flavortext")
 			to_chat(user, "<span class='notice'>["<span class='bold'>Flavortext should not include nonphysical nonsensory attributes such as backstory or the character's internal thoughts.</span>"]</span>")
 			var/new_flavortext = tgui_input_text(user, "Input your gnoll character description:", "Flavortext", flavortext, multiline = TRUE,  encode = FALSE, bigmodal = TRUE)
@@ -935,6 +957,12 @@
 	if(!valid_headshot_link(null, headshot_link, TRUE))
 		headshot_link = null
 
+	roleplay_ad = null // Older savefiles must not inherit another slot's gnoll ad.
+	S["gnoll_roleplay_ad"] >> roleplay_ad
+	if(!istext(roleplay_ad))
+		roleplay_ad = null
+	else
+		roleplay_ad = copytext(roleplay_ad, 1, MAX_MESSAGE_LEN + 1)
 	S["gnoll_flavortext"]			>> flavortext
 	S["gnoll_ooc_notes"]			>> ooc_notes
 	S["gnoll_ooc_extra"]			>> ooc_extra
@@ -982,6 +1010,7 @@
 		WRITE_FILE(S["gnoll_statpack"] , preferences_typepath_or_null(gnoll_statpack))
 
 		WRITE_FILE(S["gnoll_headshot_link"] , headshot_link)
+		WRITE_FILE(S["gnoll_roleplay_ad"], roleplay_ad)
 		WRITE_FILE(S["gnoll_flavortext"] , html_decode(flavortext))
 		WRITE_FILE(S["gnoll_ooc_notes"] , html_decode(ooc_notes))
 		WRITE_FILE(S["gnoll_ooc_extra"] ,	ooc_extra)

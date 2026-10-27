@@ -41,14 +41,19 @@
 	if(!I)
 		return ""
 	var/display_name = I.get_examine_string(user)
-	if(!I.show_examine_hover_tooltip())
+	var/list/highlight_status = I.get_examine_highlight_status()
+	if(highlight_status)
+		display_name = I.get_examine_highlight_labeled_string(highlight_status[1], display_name)
+	if(!highlight_status && !I.show_examine_hover_tooltip())
 		return display_name
 	var/self_examine = (src == user)
 	var/tooltip_html = I.get_hover_examine_html(user, self_examine)
+	if(highlight_status)
+		tooltip_html = I.get_examine_highlight_tooltip_string(highlight_status) + (tooltip_html ? "<br>[tooltip_html]" : "")
 	if(!tooltip_html)
 		return display_name
 	var/label = display_name
-	if(!I.always_show_examine_link)
+	if(!highlight_status && !I.always_show_examine_link)
 		label = "<u><font color='#add8e6'>[display_name]</font></u>"
 	return "<span data-component=\"TooltipHTML\" data-position=\"bottom-start\" data-html=\"[html_encode(tooltip_html)]\">[label]</span>"
 
@@ -335,17 +340,6 @@
 		str += beltl.integrity_check(is_smart)
 		. += str
 
-	// chastity cages go HERE, where they SHOULD'VE FUCKING GONE.
-	var/obj/item/chastity/worn_chastity = chastity_device
-	if(worn_chastity)
-		var/chastity_name = get_examine_item_name_with_hover(user, worn_chastity)
-		var/cage_exposed = get_location_accessible(src, BODY_ZONE_PRECISE_GROIN)
-		var/do_we_know_chat = (user == src)
-		if(cage_exposed)
-			. += "[m1] secured in [chastity_name]. "
-		else if(do_we_know_chat)
-			. += span_italics("[m1] covertly secured in [chastity_name]. ")
-	
 	var/chastity_toy_line = human_chastity_toy_examine_line(user, m2, m3)
 	if(chastity_toy_line)
 		. += chastity_toy_line
@@ -666,6 +660,10 @@
 				msg += "[capitalize(m2)] eyes are closed."
 			else if(has_status_effect(/datum/status_effect/debuff/sleepytime))
 				msg += "[m1] looking a little tired."
+			else if(has_status_effect(/datum/status_effect/debuff/sleepytime/t2))
+				msg += "[m1] looking pretty tired."
+			else if(has_status_effect(/datum/status_effect/debuff/sleepytime/t3))
+				msg += "[m1] looking ridiculously tired."
 	else
 		msg += "[m1] unconscious."
 //		else
@@ -793,6 +791,18 @@
 	for(var/line in lines)
 		. += span_info(line)
 
+	// Keep covered self-examine feedback, and describe exposed devices without an inline genital note.
+	var/chastity_exposed = modular_chastity_exposed(src)
+	var/show_chastity_fallback = user == src && !chastity_exposed
+	if(chastity_exposed && (user == src || modular_chastity_observer_on(user)))
+		show_chastity_fallback = !modular_chastity_genital_note_visible(src, user, ORGAN_SLOT_PENIS) && !modular_chastity_genital_note_visible(src, user, ORGAN_SLOT_VAGINA)
+	if(chastity_device && show_chastity_fallback)
+		var/chastity_name = get_examine_item_name_with_hover(user, chastity_device)
+		var/chastity_line = "[t_He] [t_is] secured in [chastity_name]."
+		if(!user?.client?.prefs || user.client.prefs.descriptor_color)
+			chastity_line = "<span style='color:#ff66cc'>[chastity_line]</span>"
+		. += span_info(chastity_line)
+
 	// for underwears that don't cover from the rear, genital descriptions are still shown
 	if(get_location_accessible(src, BODY_ZONE_PRECISE_GROIN) && src.underwear)
 		//separate these conditions to not throw an error when no underwear is worn at all
@@ -917,10 +927,10 @@
 	. = list()
 	if(!user.client?.prefs?.top_examine)
 		. += "ø ------------ ø"
-		if ((dna?.species?.id != "gnoll") && (valid_headshot_link(src, headshot_link, TRUE)) && (user.client?.prefs.chatheadshot) && (!obscure_name || client?.prefs.masked_examine))
+		if ((valid_headshot_link(src, headshot_link, TRUE)) && (user.client?.prefs.chatheadshot) && (!obscure_name || client?.prefs.masked_examine))
 			. += "[chat_headshot(headshot_link)]"
 	else
-		if ((dna?.species?.id != "gnoll") && (valid_headshot_link(src, headshot_link, TRUE)) && (user.client?.prefs.chatheadshot) && (!obscure_name || client?.prefs.masked_examine))
+		if ((valid_headshot_link(src, headshot_link, TRUE)) && (user.client?.prefs.chatheadshot) && (!obscure_name || client?.prefs.masked_examine))
 			. += "[chat_headshot(headshot_link)]\nø ------------ ø"
 		else
 			. += "ø ------------ ø"
@@ -1060,11 +1070,11 @@
 					. += span_aiprivradio("[capitalize(m2)] body is [!external.has_dried_up ? "covered in cum" : "covered in dried cum"]!")
 				if(facial)
 					. += span_aiprivradio("[capitalize(m2)] face is [!facial.has_dried_up ? "glazed with cum" : "plastered with dried cum"]!")
-				if(creampie && !drip)
+				if(creampie && (!drip || !(drip.orifice & ~SEX_PART_TAIL_MAW)))
 					. += span_aiprivradio("[capitalize(m2)] crotch is [!creampie.has_dried_up ? "a cummy mess" : "stained with dried cum"]!")
-				if(drip)
+				if(drip && drip.orifice != SEX_PART_TAIL_MAW)
 					var/is_long = istype(drip, /datum/status_effect/creampie_leak/long)
-					switch(drip.orifice)
+					switch(drip.orifice & ~SEX_PART_TAIL_MAW)
 						if(SEX_PART_CUNT)
 							. += span_aiprivradio("[m1] [is_long ? "gushing cum from [m2] sex" : "trickling cum from [m2] sex"]!")
 						if(SEX_PART_ANUS)
@@ -1309,7 +1319,7 @@
 		var/mob/living/living_examiner = examiner
 		if(HAS_TRAIT(examiner, TRAIT_DUSTRUNNER))
 			heretic_text += "Fellow runner. The dust moves."
-		else if(living_examiner?.patron?.type == /datum/patron/inhumen/matthios)
+		else if(isliving(examiner) && living_examiner.patron?.type == /datum/patron/inhumen/matthios)
 			heretic_text += "A Guild runner, by the look of them."
 		else if(examiner.job == "Bathhouse Attendant" || examiner.job == "Bathmaster")
 			heretic_text += "One of the Guild's runners. I know the signs."

@@ -30,3 +30,7 @@
 	Opening the bottle will reduce its sell price to 0.<br> 
 	</div>
 	"}
+
+/datum/book_entry/cooking
+	abstract_type = /datum/book_entry/cooking
+

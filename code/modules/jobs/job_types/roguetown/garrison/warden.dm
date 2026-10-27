@@ -23,7 +23,7 @@
 	round_contrib_points = 2
 	cmode_music = 'sound/music/combat_blackoak.ogg'
 	social_rank = SOCIAL_RANK_PEASANT
-	job_traits = list(TRAIT_OUTDOORSMAN, TRAIT_WOODSMAN, TRAIT_SURVIVAL_EXPERT)
+	job_traits = list(TRAIT_OUTDOORSMAN, TRAIT_WOODSMAN, TRAIT_SURVIVAL_EXPERT, TRAIT_EXPERT_HUNTER)
 	job_subclasses = list(
 		/datum/advclass/warden/ranger,
 		/datum/advclass/warden/forester
@@ -94,6 +94,7 @@
 		/datum/skill/misc/riding = SKILL_LEVEL_APPRENTICE,
 		/datum/skill/labor/butchering = SKILL_LEVEL_NOVICE,
 		/datum/skill/craft/cooking = SKILL_LEVEL_NOVICE, // This should let them fry meat on fires.
+		/datum/skill/misc/hunting = SKILL_LEVEL_APPRENTICE,
 	)
 
 /datum/outfit/job/roguetown/warden/ranger/pre_equip(mob/living/carbon/human/H)
@@ -112,6 +113,7 @@
 		/obj/item/rogueweapon/scabbard/sheath = 1,
 		/obj/item/reagent_containers/glass/bottle/rogue/healthpot = 1,
 		/obj/item/signal_horn = 1,
+		/obj/item/hunting_map/boars = 1,
 		)
 	H.verbs |= /mob/proc/haltyell
 	H.set_blindness(0)
@@ -172,6 +174,7 @@
 		/datum/skill/misc/riding = SKILL_LEVEL_APPRENTICE,
 		/datum/skill/labor/butchering = SKILL_LEVEL_NOVICE,
 		/datum/skill/craft/cooking = SKILL_LEVEL_NOVICE, // This should let them fry meat on fires.
+		/datum/skill/misc/hunting = SKILL_LEVEL_APPRENTICE,
 	)
 
 /datum/outfit/job/roguetown/warden/forester/pre_equip(mob/living/carbon/human/H)
@@ -183,7 +186,7 @@
 	pants = /obj/item/clothing/under/roguetown/chainlegs/iron
 	backl = /obj/item/rogueweapon/scabbard/gwstrap
 	beltr = /obj/item/rogueweapon/stoneaxe/woodcut/wardenpick
-	beltl = /obj/item/rogueweapon/huntingknife
+	beltl = /obj/item/rogueweapon/huntingknife/idagger/warden_machete
 	r_hand = /obj/item/rogueweapon/spear
 	backpack_contents = list(
 		/obj/item/storage/keyring/guard = 1,
@@ -195,12 +198,13 @@
 	H.set_blindness(0)
 
 	if(H.mind)
-		var/weapons = list("Axe", "Sword & Shield")
+		var/weapons = list("Billhook", "Steel Messer and Iron Shield", "Kriegsmesser", "Bronze War Axe and Iron Shield", "Iron Greataxe")
 		var/weapon_choice = input(H, "Choose your weapon.", "TAKE UP ARMS") as anything in weapons
 		switch(weapon_choice)
-			if("Axe")
+			if("Billhook", "Iron Greataxe")
+				r_hand = weapon_choice == "Billhook" ? /obj/item/rogueweapon/spear/billhook : /obj/item/rogueweapon/greataxe
 				H.adjust_skillrank_up_to(/datum/skill/combat/axes, SKILL_LEVEL_EXPERT, TRUE)
-			if("Sword & Shield")
+			if("Steel Messer and Iron Shield", "Kriegsmesser", "Bronze War Axe and Iron Shield")
 				backl = /obj/item/rogueweapon/shield/iron
 				beltl = /obj/item/rogueweapon/scabbard/sword
 				r_hand = /obj/item/rogueweapon/sword/short/messer
@@ -211,7 +215,17 @@
 					/obj/item/rogueweapon/huntingknife/idagger/warden_machete = 1,
 					/obj/item/signal_horn = 1
 					)
-				H.adjust_skillrank_up_to(/datum/skill/combat/swords, SKILL_LEVEL_EXPERT, TRUE)
+				if(weapon_choice == "Bronze War Axe and Iron Shield")
+					H.adjust_skillrank_up_to(/datum/skill/combat/axes, SKILL_LEVEL_EXPERT, TRUE)
+				else
+					H.adjust_skillrank_up_to(/datum/skill/combat/swords, SKILL_LEVEL_EXPERT, TRUE)
+				if(weapon_choice == "Kriegsmesser")
+					backl = /obj/item/rogueweapon/scabbard/gwstrap/forester_kriegsmesser
+					beltl = null
+					r_hand = null
+				else if(weapon_choice == "Bronze War Axe and Iron Shield")
+					beltl = /obj/item/rogueweapon/stoneaxe/woodcut/bronzebattleaxe
+					r_hand = null
 
 		var/helmets = list(
 			"Antlers of the Antelope"   = /obj/item/clothing/head/roguetown/helmet/bascinet/antler/melee,
@@ -232,3 +246,8 @@
 		var/hoodchoice = input(H, "Choose your Shroud.", "HOOD SELECTION") as anything in hoods
 		if(helmchoice != "None")
 			mask = hoods[hoodchoice]
+
+/obj/item/rogueweapon/scabbard/gwstrap/forester_kriegsmesser/Initialize(mapload)
+	. = ..()
+	sheathed = new /obj/item/rogueweapon/sword/long/kriegmesser(src)
+	update_icon()

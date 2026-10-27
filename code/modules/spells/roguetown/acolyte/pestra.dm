@@ -148,6 +148,7 @@
 		ORGAN_SLOT_LIVER,
 		ORGAN_SLOT_STOMACH,
 		ORGAN_SLOT_APPENDIX,
+		ORGAN_SLOT_GUTS,
 	)
 
 	// Remove organs that are already present
@@ -181,7 +182,8 @@
 				continue
 
 			// Try to insert the organ
-			if(organ.Insert(human_target))
+			organ.Insert(human_target)
+			if(human_target.getorganslot(organ.slot) == organ)
 				human_target.visible_message(
 					span_info("\The [organ] attaches itself to [human_target]!"),
 					span_notice("\The [organ] attaches itself to me!")

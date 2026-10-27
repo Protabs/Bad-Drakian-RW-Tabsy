@@ -30,6 +30,8 @@
 	update_action_buttons_icon()
 
 /mob/living/carbon/Destroy()
+	if(critical_alert_timer)
+		deltimer(critical_alert_timer)
 	//This must be done first, so the mob ghosts correctly before DNA etc is nulled
 	. =  ..()
 
@@ -100,6 +102,8 @@
 	var/oindex = active_hand_index
 	active_hand_index = held_index
 	if(hud_used)
+		var/atom/movable/screen/inventory/hovered_slot = hud_used.overlay_curloc
+		hovered_slot?.clear_hover_overlay()
 		hud_used.throw_icon?.update_icon()
 		hud_used.give_intent?.update_icon()
 		var/atom/movable/screen/inventory/hand/H
@@ -1133,7 +1137,32 @@
 			cure_blind(UNCONSCIOUS_BLIND)
 			return
 		if(((blood_volume in -INFINITY to BLOOD_VOLUME_SURVIVE) && !HAS_TRAIT(src, TRAIT_BLOODLOSS_IMMUNE)) || IsUnconscious() || IsSleeping() || getOxyLoss() > 75 || (HAS_TRAIT(src, TRAIT_DEATHCOMA)) || (health <= HEALTH_THRESHOLD_FULLCRIT && !HAS_TRAIT(src, TRAIT_NOHARDCRIT)))
+			if(stat != UNCONSCIOUS) // Transition into hardcrit - announce once
+				var/bled_out = (blood_volume in -INFINITY to BLOOD_VOLUME_SURVIVE) && !HAS_TRAIT(src, TRAIT_BLOODLOSS_IMMUNE)
+				var/suffocating = getOxyLoss() > 75
+				var/poisoned = health <= HEALTH_THRESHOLD_FULLCRIT && getToxLoss() >= getFireLoss() && getToxLoss() >= getBruteLoss()
+				var/burned = health <= HEALTH_THRESHOLD_FULLCRIT && getFireLoss() >= getBruteLoss()
+				if(bled_out)
+					visible_message(span_danger("<b>[src] collapses, [src.p_their()] skin pale as parchment!</b>"), \
+						span_userdanger("My blood... there is nothing left. I cannot feel my limbs."))
+				else if(suffocating)
+					visible_message(span_danger("<b>[src] collapses, [src.p_their()] lips turning blue!</b>"), \
+						span_userdanger("I cannot breathe... the world grows dark."))
+				else if(poisoned)
+					visible_message(span_danger("<b>[src] collapses, [src.p_their()] body wracked with poison!</b>"), \
+						span_userdanger("The poison is too much... I cannot go on."))
+				else if(burned)
+					if(!mind)
+						visible_message(span_danger("<b>[src] collapses - [src.p_their()] will is too weak to endure the burns!</b>"))
+					else
+						visible_message(span_danger("<b>[src] collapses, [src.p_their()] flesh charred and smoking!</b>"), \
+							span_userdanger("My body is too burnt to go on!"))
+					playsound(src, 'sound/health/burning.ogg', 60, TRUE)
+				else if(health <= HEALTH_THRESHOLD_FULLCRIT)
+					visible_message(span_danger("<b>[src] collapses, broken and bloodied!</b>"), \
+						span_userdanger("My bones are shattered... I cannot go on."))
 			stat = UNCONSCIOUS
+			cure_holdbreath() // In case you passed out from holding breathe
 			if(ishuman(src))
 				var/mob/living/carbon/human/H = src
 				H.dna?.species?.stop_wagging_tail(H)
@@ -1156,6 +1185,49 @@
 	update_spd()
 	if(stat != old_stat)
 		update_action_buttons_icon()
+	update_critical_alert()
+
+/// Repeat the active collapse balloon while its cause still applies.
+/mob/living/carbon/proc/update_critical_alert()
+	var/cause
+	var/message
+	if(stat == UNCONSCIOUS && !(status_flags & GODMODE))
+		if((blood_volume in -INFINITY to BLOOD_VOLUME_SURVIVE) && !HAS_TRAIT(src, TRAIT_BLOODLOSS_IMMUNE))
+			cause = "bloodloss"
+			message = "<font color='#bb2b2b'>bled out!</font>"
+		else if(getOxyLoss() > 75)
+			cause = "suffocation"
+			message = "<font color='#5b7ec4'>suffocating!</font>"
+		else if(health <= HEALTH_THRESHOLD_FULLCRIT)
+			if(getToxLoss() >= getFireLoss() && getToxLoss() >= getBruteLoss())
+				cause = "poison"
+				message = "<font color='#2b8a3e'>poisoned!</font>"
+			else if(getFireLoss() >= getBruteLoss())
+				cause = "burns"
+				message = "<font color='#bb2b2b'>burnt down!</font>"
+			else
+				cause = "brute"
+				message = "<font color='#bb2b2b'>beaten down!</font>"
+
+	if(!cause)
+		if(critical_alert_timer)
+			deltimer(critical_alert_timer)
+		critical_alert_timer = null
+		critical_alert_cause = null
+		return
+	if(cause == critical_alert_cause && critical_alert_timer)
+		return
+	if(critical_alert_timer)
+		deltimer(critical_alert_timer)
+	critical_alert_cause = cause
+	balloon_alert_to_viewers(message, ignored_mobs = list(src))
+	// The controlling player receives this even when unconsciousness makes them blind.
+	balloon_alert(src, message)
+	critical_alert_timer = addtimer(CALLBACK(src, PROC_REF(repeat_critical_alert)), 8 SECONDS, TIMER_STOPPABLE)
+
+/mob/living/carbon/proc/repeat_critical_alert()
+	critical_alert_timer = null
+	update_critical_alert()
 
 //called when we get cuffed/uncuffed
 /mob/living/carbon/proc/update_handcuffed()

@@ -82,6 +82,13 @@
 		J.total_positions += slots[job_title]
 		J.spawn_positions += slots[job_title]
 
+	// Guarantee the round's Gnoll capacity after modifiers, without adding to larger packs.
+	// Apply both limits because round-start allocation and late joining use different fields.
+	var/datum/job/gnoll_job = SSjob.GetJob("Gnoll")
+	if(gnoll_job)
+		gnoll_job.total_positions = max(gnoll_job.total_positions, 2)
+		gnoll_job.spawn_positions = max(gnoll_job.spawn_positions, 2)
+
 	if(!length(active_modifiers))
 		to_chat(world, span_notice("<b>Nothing.</b>"))
 		return

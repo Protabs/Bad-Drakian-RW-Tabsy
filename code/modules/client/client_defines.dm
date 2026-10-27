@@ -1,5 +1,7 @@
 
 /client
+	/// Concurrent floating alerts displayed to this client.
+	var/active_balloon_count = 0
 		//////////////////////
 		//BLACK MAGIC THINGS//
 		//////////////////////
@@ -67,8 +69,8 @@
 		////////////
 		//SECURITY//
 		////////////
-	// comment out the line below when debugging locally to enable the options & messages menu
-	control_freak = 1
+	// Allow custom macros while retaining the other client restrictions, including custom skins.
+	control_freak = CONTROL_FREAK_ALL | CONTROL_FREAK_MACROS
 
 		////////////////////////////////////
 		//things that require the database//
@@ -87,6 +89,7 @@
 	var/account_age = -1
 
 	preload_rsc = PRELOAD_RSC
+	var/cached_sounds = FALSE
 
 	var/atom/movable/screen/click_catcher/void
 

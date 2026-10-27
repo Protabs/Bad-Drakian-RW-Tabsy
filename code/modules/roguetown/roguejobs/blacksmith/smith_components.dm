@@ -261,6 +261,7 @@
 
 		if(modifier < 1)
 			I.max_integrity *= modifier
+			I.obj_integrity = I.max_integrity
 
 		I.sellprice *= modifier
 		if(istype(I, /obj/item/lockpick))

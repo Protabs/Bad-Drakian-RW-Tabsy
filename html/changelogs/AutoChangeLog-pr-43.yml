@@ -1,4 +1,0 @@
-author: "ProbablyCarl"
-delete-after: True
-changes:
-  - qol: "Unbinds 'Prevent Movement' by default."

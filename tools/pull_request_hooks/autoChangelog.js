@@ -32,7 +32,16 @@ export async function processAutoChangelog({ github, context }) {
 		context.payload.pull_request.user.login
 	);
 
-	github.rest.repos.createOrUpdateFileContents({
+	// Previous fire-and-forget call retained for reference. Without await, the
+	// compiler could start before the file exists, and API failures could be lost.
+	// github.rest.repos.createOrUpdateFileContents({
+	// 	owner: context.repo.owner,
+	// 	repo: context.repo.repo,
+	// 	path: `html/changelogs/AutoChangeLog-pr-${context.payload.pull_request.number}.yml`,
+	// 	message: `Automatic changelog for PR #${context.payload.pull_request.number} [ci skip]`,
+	// 	content: Buffer.from(yml).toString("base64"),
+	// });
+	await github.rest.repos.createOrUpdateFileContents({
 		owner: context.repo.owner,
 		repo: context.repo.repo,
 		path: `html/changelogs/AutoChangeLog-pr-${context.payload.pull_request.number}.yml`,

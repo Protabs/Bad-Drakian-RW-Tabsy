@@ -56,6 +56,9 @@ SUBSYSTEM_DEF(vote)
 	current_vote?.reset()
 	current_vote = null
 
+	for(var/ckey in GLOB.player_details)
+		var/datum/player_details/details = GLOB.player_details[ckey]
+		details.player_actions -= generated_actions
 	QDEL_LIST(generated_actions)
 
 	SStgui.update_uis(src)

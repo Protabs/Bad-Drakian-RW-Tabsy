@@ -30,6 +30,7 @@
 		/datum/advclass/cheesemaker,
 		/datum/advclass/drunkard,
 		/datum/advclass/fisher,
+		/datum/advclass/homesteader,
 		/datum/advclass/hunter,
 		/datum/advclass/hunter/spear,
 		/datum/advclass/miner,

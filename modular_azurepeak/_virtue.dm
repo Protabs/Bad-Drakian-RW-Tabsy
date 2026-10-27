@@ -2,6 +2,13 @@ GLOBAL_LIST_INIT(virtues, init_subtypes_assoc(/datum/virtue))
 
 /datum/virtue
 	parent_type = /datum/customization_trait
+	/// Wordier description, shown for /datum/virtue/background picks (equipment summary, etc).
+	var/background_desc
+	/// If TRUE, the virtue is hidden from every picker but still resolves for old saves.
+	var/unlisted = FALSE
+	/// Retired virtues (see retired.dm): kept compiling so old saves still resolve, hidden from
+	/// pickers via unlisted, and flagged here so the menu can tell the player to re-pick.
+	var/retired = FALSE
 
 /proc/apply_virtue(mob/living/carbon/human/recipient, datum/virtue/virtue_type)
 	if (!virtue_type.check_triumphs(recipient))
@@ -16,7 +23,8 @@ GLOBAL_LIST_INIT(virtues, init_subtypes_assoc(/datum/virtue))
 		REMOVE_TRAIT(recipient, TRAIT_OUTLANDER, ADVENTURER_TRAIT)
 		REMOVE_TRAIT(recipient, TRAIT_OUTLANDER, JOB_TRAIT)
 		REMOVE_TRAIT(recipient, TRAIT_OUTLANDER, TRAIT_GENERIC)
-	record_featured_object_stat(FEATURED_STATS_VIRTUES, virtue_type.name)
+	if(!istype(virtue_type, /datum/virtue/background))
+		record_featured_object_stat(FEATURED_STATS_VIRTUES, virtue_type.name)
 
 /datum/virtue/none
 	name = "None"

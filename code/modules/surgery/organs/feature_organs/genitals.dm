@@ -1,6 +1,7 @@
 /obj/item/organ/penis
+	var/penis_taur_mode = FALSE
 	name = "penis"
-	icon_state = "severedtail" //placeholder
+	icon_state = "penis"
 	visible_organ = TRUE
 	zone = BODY_ZONE_PRECISE_GROIN
 	slot = ORGAN_SLOT_PENIS
@@ -21,6 +22,22 @@
 		return 1
 	return receiver == owner ? 2 : 0.5
 
+/obj/item/organ/penis/get_icon_cache_key(obj/item/bodypart/bodypart)
+	var/datum/sprite_accessory/penis/accessory = SPRITE_ACCESSORY(accessory_type)
+	var/taur_state
+	if(istype(accessory))
+		taur_state = accessory.get_taur_icon_state(src)
+	return "[..()]-[penis_taur_mode]-[penis_size]-[sheath_type]-[erect_state]-[taur_state]"
+
+/obj/item/organ/penis/imprint_organ_dna(datum/organ_dna/organ_dna)
+	..()
+	var/datum/organ_dna/penis/penis_dna = organ_dna
+	penis_dna.penis_size = penis_size
+	penis_dna.functional = functional
+	penis_dna.sheath_type = sheath_type
+	penis_dna.penis_taur_mode = penis_taur_mode
+	penis_dna.egg_settings = islist(egg_settings) ? egg_settings.Copy() : null
+
 /obj/item/organ/penis/proc/update_erect_state()
 	var/oldstate = erect_state
 	var/new_state = ERECT_STATE_NONE
@@ -40,8 +57,24 @@
 	if(oldstate != erect_state && owner)
 		owner.update_body_parts(TRUE)
 
+/obj/item/organ/penis/bee_tail
+	name = "bee-tail penis"
+	accessory_type = /datum/sprite_accessory/penis/bee_tail
+	penis_size = SMALL_PENIS_SIZE
+
+/obj/item/organ/penis/bee_tail/get_icon_cache_key(obj/item/bodypart/bodypart)
+	var/obj/item/organ/tail/tail = owner?.getorganslot(ORGAN_SLOT_TAIL)
+	return "[..()]-[tail?.accessory_type]-[!!owner?.get_taur_tail()]"
+
+/obj/item/organ/penis/ovipositor_ant
+	name = "ovipositor"
+	accessory_type = /datum/sprite_accessory/penis/ovipositor_ant
+	penis_size = SMALL_PENIS_SIZE
+	penis_taur_mode = TRUE
+
 /obj/item/organ/penis/knotted
 	name = "knotted penis"
+	icon_state = "penis_knot"
 	penis_type = PENIS_TYPE_KNOTTED
 	sheath_type = SHEATH_TYPE_NORMAL
 
@@ -50,83 +83,99 @@
 
 /obj/item/organ/penis/equine
 	name = "equine penis"
+	icon_state = "penis_equine"
 	penis_type = PENIS_TYPE_EQUINE
 	sheath_type = SHEATH_TYPE_NORMAL
 
 /obj/item/organ/penis/equine_knotted
 	name = "equine knotted penis"
+	icon_state = "penis_equine"
 	penis_type = PENIS_TYPE_EQUINE_KNOTTED
 	sheath_type = SHEATH_TYPE_NORMAL
 
 /obj/item/organ/penis/equine_slit
 	name = "equine penis"
+	icon_state = "penis_equine"
 	penis_type = PENIS_TYPE_EQUINE
 	sheath_type = SHEATH_TYPE_SLIT
 
 /obj/item/organ/penis/equine_knotted_slit
 	name = "equine knotted penis"
+	icon_state = "penis_equine"
 	penis_type = PENIS_TYPE_EQUINE_KNOTTED
 	sheath_type = SHEATH_TYPE_SLIT
 
 /obj/item/organ/penis/tapered_mammal
 	name = "tapered penis"
+	icon_state = "penis_taper"
 	penis_type = PENIS_TYPE_TAPERED
 	sheath_type = SHEATH_TYPE_NORMAL
 
 /obj/item/organ/penis/tapered
 	name = "tapered penis"
+	icon_state = "penis_taper"
 	penis_type = PENIS_TYPE_TAPERED
 	sheath_type = SHEATH_TYPE_SLIT
 
 /obj/item/organ/penis/tapered_knotted
 	name = "tapered knotted penis"
+	icon_state = "penis_taper"
 	penis_type = PENIS_TYPE_TAPERED_KNOTTED
 	sheath_type = SHEATH_TYPE_SLIT
 
 /obj/item/organ/penis/tapered_knotted_mammal
 	name = "tapered knotted penis"
+	icon_state = "penis_taper"
 	penis_type = PENIS_TYPE_TAPERED_KNOTTED
 	sheath_type = SHEATH_TYPE_NORMAL
 
 /obj/item/organ/penis/tapered_double
 	name = "hemi tapered penis"
+	icon_state = "penis_hemi"
 	penis_type = PENIS_TYPE_TAPERED_DOUBLE
 	sheath_type = SHEATH_TYPE_SLIT
 
 /obj/item/organ/penis/tapered_double_mammal
 	name = "hemi tapered penis"
+	icon_state = "penis_hemi"
 	penis_type = PENIS_TYPE_TAPERED_DOUBLE
 	sheath_type = SHEATH_TYPE_NORMAL
 
 /obj/item/organ/penis/tapered_double_knotted
 	name = "hemi knotted tapered penis"
+	icon_state = "penis_hemi"
 	penis_type = PENIS_TYPE_TAPERED_DOUBLE_KNOTTED
 	sheath_type = SHEATH_TYPE_SLIT
 
 /obj/item/organ/penis/tapered_double_knotted_mammal
 	name = "hemi knotted tapered penis (sheath)"
+	icon_state = "penis_hemi"
 	penis_type = PENIS_TYPE_TAPERED_DOUBLE_KNOTTED
 	sheath_type = SHEATH_TYPE_NORMAL
 
 /obj/item/organ/penis/barbed
 	name = "barbed penis"
+	icon_state = "penis_knot"
 	penis_type = PENIS_TYPE_BARBED
 	sheath_type = SHEATH_TYPE_NORMAL
 
 /obj/item/organ/penis/barbed_knotted
 	name = "barbed knotted penis"
+	icon_state = "penis_knot"
 	penis_type = PENIS_TYPE_BARBED_KNOTTED
 	sheath_type = SHEATH_TYPE_NORMAL
 
 /obj/item/organ/penis/tentacle
 	name = "tentacle penis"
+	icon_state = "penis_taper"
 	penis_type = PENIS_TYPE_TENTACLE
 	sheath_type = SHEATH_TYPE_NONE
 
-	
 /obj/item/organ/vagina
+	organ_dna_type = /datum/organ_dna/vagina
+	var/vagina_taur_enabled = TRUE
 	name = "vagina"
-	icon_state = "severedtail" //placeholder
+	icon_state = "vagina"
 	visible_organ = TRUE
 	zone = BODY_ZONE_PRECISE_GROIN
 	slot = ORGAN_SLOT_VAGINA
@@ -136,7 +185,40 @@
 	var/impregnation_probability = IMPREG_PROB_DEFAULT
 	var/branded_writing = ""
 
-/obj/item/organ/vagina/proc/be_impregnated(mob/living/carbon/human/father)
+/obj/item/organ/proc/be_impregnated(mob/living/carbon/human/father)
+	return FALSE
+
+/obj/item/organ/vagina/is_visible_on_owner()
+	if(owner?.get_taur_tail() && !vagina_taur_enabled)
+		return FALSE
+	return ..()
+
+/// Regular vagina styles can also display the opening on a visible Bee tail.
+/obj/item/organ/vagina/proc/has_bee_tail_oviduct()
+	if(accessory_type == /datum/sprite_accessory/vagina/bee_tail || !owner || owner.get_taur_tail())
+		return FALSE
+	var/obj/item/organ/tail/tail = owner.getorganslot(ORGAN_SLOT_TAIL)
+	if(tail?.accessory_type != /datum/sprite_accessory/tail/bee || !tail.is_visible())
+		return FALSE
+	var/datum/sprite_accessory/tail/tail_accessory = SPRITE_ACCESSORY(tail.accessory_type)
+	return tail_accessory.is_visible(tail, null, owner)
+
+/obj/item/organ/vagina/get_icon_cache_key(obj/item/bodypart/bodypart)
+	var/bee_tail_oviduct = has_bee_tail_oviduct()
+	var/oviduct_state
+	if(accessory_type == /datum/sprite_accessory/vagina/bee_tail || bee_tail_oviduct)
+		var/datum/sprite_accessory/vagina/bee_tail/oviduct = SPRITE_ACCESSORY(/datum/sprite_accessory/vagina/bee_tail)
+		oviduct_state = oviduct.get_icon_state(src, bodypart, owner)
+	return "[..()]-[vagina_taur_enabled]-[!!owner?.get_taur_tail()]-[bee_tail_oviduct]-[oviduct_state]"
+
+/obj/item/organ/vagina/imprint_organ_dna(datum/organ_dna/organ_dna)
+	..()
+	var/datum/organ_dna/vagina/vagina_dna = organ_dna
+	vagina_dna.fertility = fertility
+	vagina_dna.vagina_taur_enabled = vagina_taur_enabled
+	vagina_dna.egg_settings = islist(egg_settings) ? egg_settings.Copy() : null
+
+/obj/item/organ/vagina/be_impregnated(mob/living/carbon/human/father)
 	if(!owner)
 		return FALSE
 	if(owner.stat == DEAD)
@@ -149,9 +231,13 @@
 	//TODO add a way to trigger lactating when pregnancy happens
 	return TRUE
 
+/obj/item/organ/vagina/bee_tail
+	name = "oviduct"
+	accessory_type = /datum/sprite_accessory/vagina/bee_tail
+
 /obj/item/organ/breasts
 	name = "breasts"
-	icon_state = "severedtail" //placeholder
+	icon_state = "breasts"
 	visible_organ = TRUE
 	zone = BODY_ZONE_CHEST
 	slot = ORGAN_SLOT_BREASTS
@@ -179,6 +265,20 @@
 /obj/item/organ/breasts/New()
 	..()
 	milk_max = max(75, breast_size * 100)
+
+/obj/item/organ/breasts/update_overlays()/// works the same way irises do for eye organ items
+	. = ..()
+	if(icon_state != "breasts")
+		return .
+
+	var/list/colors = color_string_to_list(accessory_colors)
+	var/mutable_appearance/detail_overlay = mutable_appearance(icon, "breasts_detail")
+	detail_overlay.color = length(colors) ? colors[1] : "#FFFFFF"
+	. += detail_overlay
+
+/obj/item/organ/breasts/update_accessory_colors()
+	. = ..()
+	update_icon()
 
 /obj/item/organ/breasts/Destroy()
 	stop_jiggle()
@@ -211,6 +311,9 @@
 	jiggle_cycle()
 	return TRUE
 
+/obj/item/organ/breasts/proc/is_pecs()
+	return ispath(accessory_type, /datum/sprite_accessory/breasts/pecs)
+
 /obj/item/organ/breasts/proc/jiggle_cycle()
 	jiggle_timerid = null
 	if(!is_jiggling)
@@ -233,6 +336,22 @@
 			stop_jiggle()
 			return
 	jiggle_timerid = addtimer(CALLBACK(src, PROC_REF(jiggle_cycle)), BREAST_JIGGLE_CYCLE, TIMER_STOPPABLE)
+
+/obj/item/organ/breasts/proc/thrust_jiggle_on()
+	if(!ishuman(owner))
+		return
+	var/mob/living/carbon/human/H = owner
+	if(H.stat != CONSCIOUS || H.cmode || H.doing)
+		return
+	if(is_jiggling)
+		return
+	is_jiggling = TRUE
+	H.update_body_parts(TRUE)
+	refresh_viewers(H)
+
+/obj/item/organ/breasts/proc/thrust_jiggle_off()
+	stop_jiggle()
+	refresh_viewers(owner)
 
 /obj/item/organ/breasts/proc/stop_jiggle()
 	if(jiggle_timerid)
@@ -275,7 +394,7 @@
 
 /obj/item/organ/testicles
 	name = "testicles"
-	icon_state = "severedtail" //placeholder
+	icon_state = "testicles"
 	visible_organ = TRUE
 	zone = BODY_ZONE_PRECISE_GROIN
 	slot = ORGAN_SLOT_TESTICLES
@@ -284,6 +403,13 @@
 	var/ball_size = DEFAULT_TESTICLES_SIZE
 	var/virility = TRUE
 	var/branded_writing = ""
+
+/obj/item/organ/testicles/get_icon_cache_key(obj/item/bodypart/bodypart)
+	var/datum/sprite_accessory/testicles/accessory = SPRITE_ACCESSORY(accessory_type)
+	var/taur_state
+	if(istype(accessory))
+		taur_state = accessory.get_taur_icon_state(src)
+	return "[..()]-[ball_size]-[taur_state]"
 
 /obj/item/organ/testicles/internal
 	name = "internal testicles"

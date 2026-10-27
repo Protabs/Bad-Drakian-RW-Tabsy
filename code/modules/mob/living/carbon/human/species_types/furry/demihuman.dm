@@ -102,6 +102,7 @@
 		ORGAN_SLOT_LIVER = /obj/item/organ/liver,
 		ORGAN_SLOT_STOMACH = /obj/item/organ/stomach,
 		ORGAN_SLOT_APPENDIX = /obj/item/organ/appendix,
+		ORGAN_SLOT_GUTS = /obj/item/organ/guts,
 		)
 	bodypart_features = list(
 		/datum/bodypart_feature/hair/head,
@@ -118,6 +119,7 @@
 		/datum/customizer/organ/ears/demihuman,
 		/datum/customizer/organ/horns/demihuman,
 		/datum/customizer/organ/tail/demihuman,
+		/datum/customizer/organ/tail/manticore,
 		/datum/customizer/organ/wings/anthro,
 		/datum/customizer/organ/testicles/anthro,
 		/datum/customizer/organ/penis/anthro,
@@ -125,7 +127,7 @@
 		/datum/customizer/organ/vagina/animal,
 		/datum/customizer/bodypart_feature/pubes/furry,
 		/datum/customizer/bodypart_feature/pits/furry,
-		/datum/customizer/organ/horns/tusks,
+		/datum/customizer/organ/tusks/humanoid,
 		)
 	body_marking_sets = list(
 		/datum/body_marking_set/none,
@@ -141,6 +143,7 @@
 		/datum/body_marking/tall_eyes,
 		/datum/body_marking/outer_tall_eyes,
 		/datum/body_marking/blank_face,
+		/datum/body_marking/face_paint,
 		/datum/body_marking/tonage,
 		/datum/body_marking/socklonger,
 		/datum/body_marking/tips,

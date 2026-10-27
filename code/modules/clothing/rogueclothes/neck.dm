@@ -320,7 +320,7 @@
 
 /obj/item/clothing/neck/roguetown/bevor/zizo
 	name = "avantyne bevor"
-	desc = "An avantyne neckguard cut for the medium rite, still protective without becoming impossible to remove."
+	desc = "<font color='A50021'>Near them, on the sand, half sunk, a shattered visage lies.</font>"
 	icon_state = "zizobevor"
 	item_state = "zizobevor"
 	peel_threshold = 5
@@ -531,9 +531,9 @@
 
 	return TRUE
 
-/obj/item/clothing/neck/roguetown/psicross/attack_right(mob/user)
-	if(!ismob(loc))
-		return ..()
+/obj/item/clothing/neck/roguetown/psicross/MiddleClick(mob/user, params)
+	if(loc != user || user.incapacitated())
+		return
 
 	wrist_display = !wrist_display
 	to_chat(user, span_info("You adjust \the [src] to [wrist_display ? "display on your wrists" : "display around your neck"]."))
@@ -547,12 +547,17 @@
 	if(isliving(loc))
 		var/mob/living/L = loc
 		L.regenerate_clothes()
-	return ..()
+	return TRUE
+
+/obj/item/clothing/neck/roguetown/psicross/examine(mob/user)
+	. = ..()
+	. += span_info("Middle-click to adjust the amulet's wrist/neck display. Right-click to pray if you know how.")
 
 /obj/item/clothing/neck/roguetown/psicross/inhumen
 	name = "inverted psycross"
 	desc = "A symbol of ambition from an era that had reason to believe in it."
 	icon_state = "zcross_iron"
+	slot_flags = ITEM_SLOT_NECK|ITEM_SLOT_HIP|ITEM_SLOT_WRISTS|ITEM_SLOT_RING
 
 /obj/item/clothing/neck/roguetown/psicross/inhumen/ancient
 	name = "ancient zcross"
@@ -999,7 +1004,7 @@
 
 /obj/item/clothing/neck/roguetown/psicross/weeping
 	name = "weeping psicross"
-	desc = "'Let His name be naught but forgot'n.' </br>The alloy is familiar, but unmentionable. Blood oozes from cracks within the psicross; ensnared in a perpetual state of half-coagulation. A deathly chill tugs your neck, and your cheeks feel wet - are those tears?"
+	desc = "'Let His name be naught but forgot'n.' The alloy is familiar, but unmentionable. Blood oozes from cracks within the psicross; ensnared in a perpetual state of half-coagulation. A deathly chill tugs your neck, and your cheeks feel wet - are those tears?"
 	slot_flags = ITEM_SLOT_NECK|ITEM_SLOT_WRISTS
 	icon_state = "psicrossblood"
 	max_integrity = 666

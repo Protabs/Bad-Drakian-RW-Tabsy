@@ -26,11 +26,12 @@
 	dispel_conjured_item()
 	var/obj/item/rogueweapon/R = new /obj/item/rogueweapon/magicbrick(user.drop_location())
 
-	if(user.STAINT > 10)
-		var/int_scaling = user.STAINT - 10
-		R.force = R.force + int_scaling
-		R.throwforce = R.throwforce + int_scaling * 2 // 2x scaling for throwing. Let's go.
-		R.name = "magician's brick +[int_scaling]"
+	var/int_deviation = abs(user.STAINT - 10)//scales linear in a U curve; both the trog and the archmagos understand hitting someone with a brick hurts a lot
+
+	R.force += int_deviation
+	R.throwforce += int_deviation * 2// 2x scaling for throwing. Let's go.
+	R.name = "magician's brick +[int_deviation]"
+
 	user.put_in_hands(R)
 	set_conjured_item(R)
 	return TRUE
@@ -38,6 +39,8 @@
 
 
 /obj/item/rogueweapon/magicbrick
+	twirly = SKILL_LEVEL_JOURNEYMAN
+	twirl_speed = 6
 	name = "magician's brick"
 	desc = "A brick formed out of arcane energy. Not a actual brick and cannot be used for construction. Makes for a very deadly melee and throwing weapon."
 	icon = 'icons/roguetown/items/cooking.dmi'
@@ -56,3 +59,12 @@
 	possible_item_intents = list(/datum/intent/mace/strike) // Not giving it smash so it don't become competetive with conjure weapon (as a melee weapon)
 	associated_skill = /datum/skill/combat/maces // If it was tied to Arcyne it'd be too strong
 	hitsound = list('sound/combat/hits/blunt/brick.ogg')
+
+/obj/item/rogueweapon/magicbrick/twirl_fumble(mob/living/user)
+	return twirl_fumble_bonk(user, 'sound/combat/hits/blunt/brick.ogg')
+
+/obj/item/rogueweapon/magicbrick/twirl_skill_needed()
+	return SKILL_LEVEL_APPRENTICE
+
+/obj/item/rogueweapon/magicbrick/twirl_user_skill(mob/living/user)
+	return user.get_skill_level(/datum/skill/magic/arcane)

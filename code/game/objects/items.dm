@@ -575,9 +575,11 @@ GLOBAL_VAR_INIT(rpg_loot_items, FALSE)
 		if(minstr_req)
 			inspec += "\n<b>NO HALVING ON WIELD</b>"
 
+		if(armor_penetration)
+			inspec += "\n<b>INNATE ARMOR PENETRATION:</b> [armor_penetration]"
 		if(force)
 			inspec += "\n<b>FORCE:</b> [get_force_string(force)] <span class='info'><a href='?src=[REF(src)];showforce=1'>{?}</a></span>"
-		if(gripped_intents && !wielded)
+		if(gripped_intents)
 			if(force_wielded)
 				inspec += "\n<b>WIELDED FORCE:</b> [get_force_string(force_wielded)] <span class='info'><a href='?src=[REF(src)];showforcewield=1'>{?}</a></span>"
 
@@ -944,6 +946,7 @@ GLOBAL_VAR_INIT(rpg_loot_items, FALSE)
 
 /obj/item/proc/dropped(mob/user, silent = FALSE)
 	SHOULD_CALL_PARENT(TRUE)
+	end_spin()
 	for(var/X in actions)
 		var/datum/action/A = X
 		A.Remove(user)
@@ -990,6 +993,10 @@ GLOBAL_VAR_INIT(rpg_loot_items, FALSE)
 
 // called when "found" in pockets and storage items. Returns 1 if the search should end.
 /obj/item/proc/on_found(mob/finder)
+	return
+
+/// called when an item is released by opening its package
+/obj/item/proc/on_package_opened(mob/user)
 	return
 
 // called after an item is placed in an equipment slot
@@ -1049,8 +1056,8 @@ GLOBAL_VAR_INIT(rpg_loot_items, FALSE)
 //Set disable_warning to TRUE if you wish it to not give you outputs.
 /obj/item/proc/mob_can_equip(mob/living/M, mob/living/equipper, slot, disable_warning = FALSE, bypass_equip_delay_self = FALSE)
 	if((is_silver || smeltresult == /obj/item/ingot/silver) && (HAS_TRAIT(M, TRAIT_SILVER_WEAK) &&  !M.has_status_effect(STATUS_EFFECT_ANTIMAGIC)))
-		var/datum/antagonist/vampire/V_lord = M.mind?.has_antag_datum(/datum/antagonist/vampire/)
-		if(V_lord?.generation >= GENERATION_METHUSELAH)
+		var/datum/antagonist/vampire/V_lord = M.mind?.has_antag_datum(/datum/antagonist/vampire)
+		if(V_lord && V_lord.generation >= GENERATION_METHUSELAH)
 			return
 
 		to_chat(M, span_userdanger("I can't pick up the silver, it is my BANE!"))
@@ -1533,6 +1540,22 @@ GLOBAL_VAR_INIT(rpg_loot_items, FALSE)
 	if(HAS_TRAIT(src, TRAIT_NODROP))
 		return
 	return ..()
+
+/obj/item/proc/is_smeltable()
+	return !!smeltresult
+
+/obj/item/proc/is_salvageable()
+	return sewrepair && salvage_result && (salvage_amount > 0)
+
+/obj/item/proc/matches_loot_filter(loot_filter)
+	switch(loot_filter)
+		if(LOOT_FILTER_ALL)
+			return TRUE
+		if(LOOT_FILTER_FABRIC)
+			return is_salvageable()
+		if(LOOT_FILTER_SMELT)
+			return is_smeltable()
+	return FALSE
 
 /obj/item/proc/canStrip(mob/stripper, mob/owner)
 	if(HAS_TRAIT(loc, TRAIT_STUCKITEMS))

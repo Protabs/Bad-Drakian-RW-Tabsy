@@ -130,8 +130,8 @@
 		)
 
 /obj/item/recipe_book/cooking
-	name = "The Culinary Codex"
-	desc = "A book full of recipes and tips for cooking. This version looks very incomplete, and only contain brewing recipes. Perhaps it will be filled in later?"
+	name = "Guide to Brewing"
+	desc = "A practical guide to brewing, distilling, bottling and selling drinks."
 	icon_state = "book2_0"
 	base_icon_state = "book2"
 
@@ -139,6 +139,28 @@
 		/datum/brewing_recipe,
 		/datum/book_entry/brewing
 	)
+
+/obj/item/recipe_book/cooking_guide
+	name = "Guide to Cooking"
+	desc = "A handwritten guide to ordinary kitchen work and recipes."
+	icon_state = "book7_0"
+	base_icon_state = "book7"
+	types = list(/datum/book_entry/cooking)
+
+/obj/item/recipe_book/cooking_guide/generate_categories()
+	. = ..()
+	var/list/preferred_order = list(
+		"Soups and Stews", "Meat", "Seafood", "Baked", "Pastries", "Cakes",
+		"Pies", "Eggs", "Rice", "Deep Frying", "Dairy", "Preserved", "Other"
+	)
+	var/list/reordered = list("All")
+	for(var/category in preferred_order)
+		if(category in categories)
+			reordered += category
+	for(var/category in categories)
+		if(!(category in reordered))
+			reordered += category
+	categories = reordered
 
 /obj/item/recipe_book/magic
 	name = "The Magister's Grimoire"

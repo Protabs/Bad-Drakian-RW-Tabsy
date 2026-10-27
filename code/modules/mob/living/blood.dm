@@ -243,6 +243,15 @@
 
 			if(blood_volume <= BLOOD_VOLUME_BAD)
 				adjustOxyLoss(blood_volume <= BLOOD_VOLUME_SURVIVE ? 3 : 1)
+				if(world.time >= last_gasp)
+					last_gasp = world.time + rand(3 SECONDS, 9 SECONDS)
+					if(ishuman(src))
+						var/mob/living/carbon/human/H = src
+						H.deathgasp_noise()
+						if(H.mind && H.mind.key) // #7272: player filter must not dereference a null mind.
+							H.deathgasp_visual()
+							if(prob(50))
+								emote("struggles to breathe, deathly pale!")
 			else if((blood_volume > BLOOD_VOLUME_SURVIVE) || HAS_TRAIT(src, TRAIT_BLOODLOSS_IMMUNE) || HAS_TRAIT(src, TRAIT_JOURNEYS_END))
 				if(getOxyLoss())
 					adjustOxyLoss(-1.6)
@@ -536,3 +545,33 @@
 /mob/living/carbon/human/add_splatter_floor(turf/T, small_drip)
 	if(!(NOBLOOD in dna.species.species_traits) && !(INVISBLOOD in dna.species.species_traits)) //OV EDIT
 		..()
+
+/mob/living/carbon/human/proc/deathgasp_visual()
+	var/le_gasp = pick("gasp", "choke", "gag", "wheeze", "gurgle", "sputter")
+	var/gasp_color
+	var/oxygen_loss = getOxyLoss()
+	// Ordered thresholds also cover fractional oxygen damage between the original integer bands.
+	if(oxygen_loss <= 20)
+		gasp_color = "#00ff40"
+	else if(oxygen_loss <= 40)
+		gasp_color = "#c8ff00"
+	else if(oxygen_loss <= 60)
+		gasp_color = "#eeff00"
+	else if(oxygen_loss <= 80)
+		gasp_color = "#ff9100"
+	else
+		gasp_color = "#ff0000"
+	var/gasptext = "<font color='[gasp_color]'>*[le_gasp]!* (dying)</font>"
+	// All nearby viewers can see dying alerts; the dying character remains excluded.
+	balloon_alert_to_viewers(gasptext, ignored_mobs = list(src))
+
+/mob/living/carbon/human/proc/deathgasp_noise()
+	if(HAS_TRAIT(src, TRAIT_NOBREATH))
+		return
+	var/gaspnoise
+	if(gender == MALE)
+		gaspnoise = pick('sound/vo/male/gen/mchoke1.ogg', 'sound/vo/male/gen/mchoke2.ogg', 'sound/vo/male/gen/mchoke3.ogg', 'sound/vo/male/gen/mchoke4.ogg')
+	else if(gender == FEMALE)
+		gaspnoise = pick('sound/vo/female/gen/femchoke1.ogg', 'sound/vo/female/gen/femchoke2.ogg', 'sound/vo/female/gen/femchoke3.ogg', 'sound/vo/female/gen/femchoke4.ogg')
+	if(gaspnoise)
+		playsound(get_turf(src), gaspnoise, 90, FALSE)

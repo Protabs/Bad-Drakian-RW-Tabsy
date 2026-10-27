@@ -600,6 +600,13 @@
 /proc/remove_image_from_client(image/image_to_remove, client/remove_from)
 	remove_from?.images -= image_to_remove
 
+/// Removes a floating alert and releases its client stack slot.
+/proc/remove_balloon_from_client(image/image_to_remove, client/remove_from)
+	if(!remove_from)
+		return
+	remove_from.images -= image_to_remove
+	remove_from.active_balloon_count = max(0, remove_from.active_balloon_count - 1)
+
 /// Returns this user's display ckey, used in OOC contexts.
 /proc/get_display_ckey(key)
 	var/ckey = ckey(key)

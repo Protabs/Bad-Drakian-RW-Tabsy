@@ -1,6 +1,8 @@
 /datum/vote/chaos
 	name = "chaos"
-	default_message = "Vote for round type. Adventure mode disables villains and doubles adventurer count."
+	// Previous wording retained: Adventure now permits the guaranteed Gnoll roles.
+	// default_message = "Vote for round type. Adventure mode disables villains and doubles adventurer count."
+	default_message = "Vote for round type. Adventure mode doubles adventurer count and disables villains other than Wretches and Gnolls."
 	default_choices = list("Adventure", "Chaos")
 	count_method = VOTE_COUNT_METHOD_SINGLE
 	winner_method = VOTE_WINNER_METHOD_SIMPLE

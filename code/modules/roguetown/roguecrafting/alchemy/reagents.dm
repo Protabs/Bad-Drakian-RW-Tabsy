@@ -350,13 +350,15 @@ If you want to expand on poisons theres tons of fun effects TG chemistry has tha
 	reagent_state = LIQUID
 	color = "#083b1c"
 	taste_description = "breathlessness"
-	metabolization_rate = 0.1 * REAGENTS_METABOLISM * 3
+	metabolization_rate = 0.1 * REAGENTS_METABOLISM
 	harmful = TRUE
 
 
 /datum/reagent/stampoison/on_mob_life(mob/living/carbon/M)
 	if(!HAS_TRAIT(M,TRAIT_INFINITE_STAMINA))
 		M.energy_add(-45) //Slowly leech energy
+	if(volume >= 30)
+		M.reagents.remove_reagent(/datum/reagent/stampoison, 2) //No infinite energy drain
 	return ..()
 
 /datum/reagent/strongstampoison
@@ -365,13 +367,15 @@ If you want to expand on poisons theres tons of fun effects TG chemistry has tha
 	reagent_state = LIQUID
 	color = "#041d0e"
 	taste_description = "frozen air"
-	metabolization_rate = 0.1 * REAGENTS_METABOLISM * 9
+	metabolization_rate = 0.1 * REAGENTS_METABOLISM
 	harmful = TRUE
 
 
 /datum/reagent/strongstampoison/on_mob_life(mob/living/carbon/M)
 	if(!HAS_TRAIT(M,TRAIT_INFINITE_STAMINA))
 		M.energy_add(-180) //Rapidly leech energy
+	if(volume >= 30)
+		M.reagents.remove_reagent(/datum/reagent/strongstampoison, 2) //No infinite energy drain
 	return ..()
 
 /datum/reagent/toxin/killersice
@@ -520,7 +524,14 @@ If you want to expand on poisons theres tons of fun effects TG chemistry has tha
 	color = "#ff7300"
 	taste_description = "burning coal"
 
+/datum/reagent/fire_resist/on_mob_metabolize(mob/living/M)
+	. = ..()
+	if(HAS_TRAIT(M, TRAIT_SILVER_WEAK))
+		to_chat(M, span_warning("My silver weakness prevents this potion from protecting me against fire."))
+
 /datum/reagent/fire_resist/on_mob_life(mob/living/carbon/M)
+	if(HAS_TRAIT(M, TRAIT_SILVER_WEAK))
+		return ..()
 	M.apply_status_effect(/datum/status_effect/buff/alch/fire_resist)
 	return ..()
 

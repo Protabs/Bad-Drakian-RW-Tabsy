@@ -111,6 +111,13 @@
 	skillcraft = /datum/skill/craft/carpentry
 	craftdiff = 0
 
+/datum/crafting_recipe/roguetown/structure/gloryhole/iron
+	name = "iron gloryhole"
+	result = /obj/structure/bondage/gloryhole/iron
+	reqs = list(/obj/item/ingot/iron = 1)
+	skillcraft = /datum/skill/craft/engineering
+	craftdiff = 1
+
 /datum/crafting_recipe/roguetown/structure/chains
 	name = "chains"
 	result = /obj/structure/bondage/chains
@@ -1220,6 +1227,13 @@
 	reqs = list(/obj/item/rope = 1, /obj/item/grown/log/tree/small = 2)
 	craftdiff = 2
 	craftsound = 'sound/foley/Building-01.ogg'
+	ontile = TRUE
+
+/datum/crafting_recipe/roguetown/structure/guillotine
+	name = "guillotine"
+	result = /obj/structure/guillotine
+	reqs = list(/obj/item/grown/log/tree/small = 3, /obj/item/ingot/iron = 2, /obj/item/rope = 1)
+	craftdiff = 3
 	ontile = TRUE
 
 /datum/crafting_recipe/roguetown/structure/pillory

@@ -378,6 +378,12 @@
 			animate(pixel_x=rand(min,max), pixel_y=rand(min,max), time=1)
 	animate(pixel_x=oldx, pixel_y=oldy, time=1)
 
+/// refreshes vision of everyone visible 2 update icon_state changes ! Usually not needed
+/proc/refresh_viewers(atom/source)
+	for(var/mob/M in viewers(7, source))
+		if(M.client)
+			M.update_vision_cone()
+
 
 ///Find if the message has the real name of any user mob in the mob_list
 /proc/findname(msg)
@@ -503,10 +509,10 @@
 	var/list/intents
 	var/obj/item/Masteritem = active ? get_active_held_item() : get_inactive_held_item()
 	if(Masteritem)
-		if(Masteritem.wielded)
-			intents = Masteritem.gripped_intents
-		else if(Masteritem.altgripped)
+		if(Masteritem.altgripped)
 			intents = Masteritem.alt_intents
+		else if(Masteritem.wielded)
+			intents = Masteritem.gripped_intents
 		else
 			intents = Masteritem.possible_item_intents
 	else
@@ -663,6 +669,7 @@
 			animate(client, pixel_y)
 	else
 		cmode = TRUE
+		SEND_SIGNAL(L, COMSIG_MOB_COMBAT_MODE_ENABLED)
 		playsound_local(src, 'sound/misc/combon.ogg', 100)
 		if(length(L.cmode_music_override))
 			SSdroning.play_combat_music(L.cmode_music_override, client)
