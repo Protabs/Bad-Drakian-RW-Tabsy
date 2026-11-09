@@ -23,7 +23,7 @@
 	invocations = list("Appare, spiritus fidus.")
 	invocation_type = "whisper"
 
-	var/mob/living/simple_animal/pet/familiar/fam
+	var/mob/living/fam
 	var/familiars = list()
 
 /obj/effect/proc_holder/spell/self/findfamiliar/Initialize(mapload)
@@ -44,10 +44,10 @@
 
 	. = ..()
 
-	// Check if user already has a familiar
-	for (var/mob/living/simple_animal/pet/familiar/fam in GLOB.alive_mob_list + GLOB.dead_mob_list)
-		if (fam.familiar_summoner == user)
-			if(fam.health <= 0)
+	// Check if user already has a familiar (non-sentient or player-controlled)
+	for (var/mob/living/fam in GLOB.alive_mob_list + GLOB.dead_mob_list)
+		if (get_familiar_summoner(fam) == user)
+			if(fam.stat == DEAD)
 				var/choice = input(user, "Your familiar is dead. What do you want to do?") as null|anything in list("Revive with magic stone", "Free them")
 				if(choice == "Revive with magic stone")
 					to_chat(user, span_notice("You will need a magical stone in your active hand to attempt resurrection."))
@@ -239,17 +239,43 @@
 	popup.set_content(dat.Join("\n"))
 	popup.open(FALSE)
 
+/// Familiars come as simple animals (non-sentient) or as humans (player-controlled); these read the shared bond data of either.
+/proc/get_familiar_summoner(mob/living/fam)
+	if(istype(fam, /mob/living/simple_animal/pet/familiar))
+		var/mob/living/simple_animal/pet/familiar/animal_familiar = fam
+		return animal_familiar.familiar_summoner
+	if(istype(fam, /mob/living/carbon/human/species/familiar))
+		var/mob/living/carbon/human/species/familiar/human_familiar = fam
+		return human_familiar.familiar_summoner
+
+/proc/set_familiar_summoner(mob/living/fam, mob/living/summoner)
+	if(istype(fam, /mob/living/simple_animal/pet/familiar))
+		var/mob/living/simple_animal/pet/familiar/animal_familiar = fam
+		animal_familiar.familiar_summoner = summoner
+	else if(istype(fam, /mob/living/carbon/human/species/familiar))
+		var/mob/living/carbon/human/species/familiar/human_familiar = fam
+		human_familiar.familiar_summoner = summoner
+
+/proc/get_familiar_buff(mob/living/fam)
+	if(istype(fam, /mob/living/simple_animal/pet/familiar))
+		var/mob/living/simple_animal/pet/familiar/animal_familiar = fam
+		return animal_familiar.buff_given
+	if(istype(fam, /mob/living/carbon/human/species/familiar))
+		var/mob/living/carbon/human/species/familiar/human_familiar = fam
+		return human_familiar.buff_given
+
 ///Used to free a familiar from its summoner.
-/proc/free_familiar(mob/living/simple_animal/pet/familiar/fam, mob/living/carbon/user)
+/proc/free_familiar(mob/living/fam, mob/living/carbon/user)
 	if (QDELETED(fam))
 		to_chat(user, span_warning("The familiar is already gone."))
 		return
 	to_chat(user, span_warning("You feel your link with [fam.name] break."))
 	to_chat(fam, span_warning("You feel your link with [user.name] break, you are free."))
 
-	fam.familiar_summoner = null
-	if (fam.buff_given)
-		user.remove_status_effect(fam.buff_given)
+	var/buff = get_familiar_buff(fam)
+	set_familiar_summoner(fam, null)
+	if (buff)
+		user.remove_status_effect(buff)
 
 	user.mind?.RemoveSpell(/obj/effect/proc_holder/spell/self/message_familiar)
 	fam.mind?.RemoveSpell(/obj/effect/proc_holder/spell/self/message_summoner)
@@ -285,9 +311,18 @@
 		to_chat(user, span_warning("Familiar summoning failed: The target has no valid familiar form."))
 		return
 
+	var/player_familiar_type = GLOB.familiar_player_types[prefs.familiar_specie]
+	if (!ispath(player_familiar_type, /mob/living/carbon/human/species/familiar))
+		to_chat(user, span_warning("Familiar summoning failed: The target has no valid familiar form."))
+		return
+
+	if (!chosen_one.mind)
+		to_chat(user, span_warning("Familiar summoning failed: Target has no mind to transfer."))
+		return
+
 	// Spawn the familiar mob near the summoner
 	var/turf/spawn_turf = get_step(user, user.dir)
-	var/mob/living/simple_animal/pet/familiar/awakener = new prefs.familiar_specie(spawn_turf)
+	var/mob/living/carbon/human/species/familiar/awakener = new player_familiar_type(spawn_turf)
 	if (!awakener)
 		to_chat(user, span_warning("Familiar summoning failed: Could not create familiar."))
 		return
@@ -305,11 +340,6 @@
 		user.apply_status_effect(awakener.buff_given)
 
 	// Transfer player's mind to the familiar
-	if (!chosen_one.mind)
-		to_chat(user, span_warning("Familiar summoning failed: Target has no mind to transfer."))
-		qdel(awakener)
-		return
-
 	chosen_one.mind.transfer_to(awakener, 1)
 	var/datum/mind/mind_datum = awakener.mind
 	if (!mind_datum)
@@ -330,13 +360,6 @@
 				if (spell_instance)
 					mind_datum.AddSpell(spell_instance)
 
-	// Disable automated/AI features
-	awakener.can_have_ai = FALSE
-	awakener.AIStatus = AI_OFF
-	awakener.stop_automated_movement = TRUE
-	awakener.stop_automated_movement_when_pulled = TRUE
-	awakener.wander = FALSE
-
 	var/faction_to_add = "[user.mind.current.real_name]_faction" //Should stop necromancer's skellies from murdering the necromancer's pet.
 	awakener.faction |= faction_to_add
 
@@ -349,9 +372,9 @@
 
 /obj/effect/proc_holder/spell/self/message_familiar/cast(list/targets, mob/user)
 	. = ..()
-	var/mob/living/simple_animal/pet/familiar/familiar
-	for(var/mob/living/simple_animal/pet/familiar/familiar_check in GLOB.player_list)
-		if(familiar_check.familiar_summoner == user)
+	var/mob/living/familiar
+	for(var/mob/living/familiar_check in GLOB.player_list)
+		if(get_familiar_summoner(familiar_check) == user)
 			familiar = familiar_check
 	if(!familiar || !familiar.mind)
 		revert_cast()
@@ -367,13 +390,13 @@
 	log_game("[key_name(user)] sent a message to [key_name(familiar)] with contents [message]")
 	return TRUE
 
-/proc/revive_familiar(obj/item/natural/stone/magic_stone, mob/living/simple_animal/pet/familiar/fam, mob/living/carbon/user)
+/proc/revive_familiar(obj/item/natural/stone/magic_stone, mob/living/fam, mob/living/carbon/user)
 	// Consume the stone
 	to_chat(user, span_notice("You channel the stone's magic into [fam.name], reviving them!"))
 	qdel(magic_stone)
 
 	// Revive and fully heal the familiar
 	fam.revive(full_heal = TRUE, admin_revive = TRUE)
-	fam.familiar_summoner = user
+	set_familiar_summoner(fam, user)
 	fam.visible_message(span_notice("[fam.name] is restored to life by [user]'s magic!"))
 	return TRUE

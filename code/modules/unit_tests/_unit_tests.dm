@@ -91,6 +91,7 @@
 #include "colorblind_hud_palette.dm"
 #include "component_tests.dm"
 #include "create_and_destroy.dm"
+#include "familiars.dm"
 #include "focus_only_tests.dm"
 #include "harddels.dm"
 #include "penis_taur_mode.dm"

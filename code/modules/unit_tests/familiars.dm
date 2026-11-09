@@ -1,0 +1,47 @@
+/// Assert that player-controlled familiar types have the correct properties and behavior.
+/datum/unit_test/familiar_player_types/Run()
+	var/turf/spawn_at = run_loc_floor_bottom_left
+	var/mob/living/carbon/human/summoner = allocate(/mob/living/carbon/human/consistent, spawn_at)
+
+	for(var/familiar_name in GLOB.familiar_types)
+		var/animal_type = GLOB.familiar_types[familiar_name]
+		var/player_type = GLOB.familiar_player_types[animal_type]
+		TEST_ASSERT(ispath(player_type, /mob/living/carbon/human/species/familiar), "[familiar_name] has no player-controlled counterpart")
+
+		var/mob/living/carbon/human/species/familiar/familiar_mob = allocate(player_type, spawn_at)
+		TEST_ASSERT_EQUAL(familiar_mob.dna.species.type, /datum/species/familiar, "[familiar_name] has the wrong species")
+		TEST_ASSERT(familiar_mob.familiar_icon_state, "[familiar_name] has no icon state")
+		TEST_ASSERT_EQUAL(familiar_mob.icon_state, familiar_mob.familiar_icon_state, "[familiar_name] did not render its sprite")
+		for(var/spell_path in familiar_mob.inherent_spell)
+			TEST_ASSERT(ispath(spell_path, /obj/effect/proc_holder/spell), "[familiar_name] has an invalid spell [spell_path]")
+
+		set_familiar_summoner(familiar_mob, summoner)
+		TEST_ASSERT_EQUAL(get_familiar_summoner(familiar_mob), summoner, "[familiar_name] summoner was not stored")
+		set_familiar_summoner(familiar_mob, null)
+		TEST_ASSERT_NULL(get_familiar_summoner(familiar_mob), "[familiar_name] summoner was not cleared")
+
+/datum/unit_test/familiar_stoneform/Run()
+	var/mob/living/carbon/human/species/familiar/pondstone_toad/toad = allocate(/mob/living/carbon/human/species/familiar/pondstone_toad, run_loc_floor_bottom_left)
+	var/obj/effect/proc_holder/spell/self/stillness_of_stone/spell = new
+	var/familiar_icon = toad.icon_state
+
+	spell.cast(user = toad)
+	TEST_ASSERT(toad.stoneform, "Stillness of Stone did not enter stoneform")
+	TEST_ASSERT_EQUAL(toad.icon_state, "stone1", "Stoneform did not change the sprite")
+	TEST_ASSERT_EQUAL(toad.get_visible_name(), "Stone", "Stoneform did not change the visible name")
+
+	spell.cast(user = toad)
+	TEST_ASSERT(!toad.stoneform, "Stillness of Stone did not leave stoneform")
+	TEST_ASSERT_EQUAL(toad.icon_state, familiar_icon, "Leaving stoneform did not restore the sprite")
+	qdel(spell)
+
+/datum/unit_test/familiar_death/Run()
+	var/mob/living/carbon/human/species/familiar/rune_rat/rat = allocate(/mob/living/carbon/human/species/familiar/rune_rat, run_loc_floor_bottom_left)
+	var/obj/item/paper/stored_paper = allocate(/obj/item/paper, rat.loc)
+	stored_paper.forceMove(rat)
+	rat.stored_books += stored_paper
+
+	rat.death()
+	TEST_ASSERT_EQUAL(rat.stat, DEAD, "Familiar did not die")
+	TEST_ASSERT(!length(rat.stored_books), "Stored items were not released on death")
+	TEST_ASSERT_EQUAL(stored_paper.loc, rat.loc, "Stored items were not dropped where the familiar died")

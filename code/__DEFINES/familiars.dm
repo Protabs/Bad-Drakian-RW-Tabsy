@@ -14,6 +14,27 @@ GLOBAL_LIST_INIT(familiar_types, list(
 				"Thornback Turtle" = /mob/living/simple_animal/pet/familiar/thornback_turtle
 ))
 
+#define FAMILIAR_SEE_IN_DARK 6
+#define FAMILIAR_MIN_BODYTEMP 200
+#define FAMILIAR_MAX_BODYTEMP 400
+
+/// Non-sentient (simple animal) familiar type -> human-based type a player controls when awakened.
+GLOBAL_LIST_INIT(familiar_player_types, list(
+	/mob/living/simple_animal/pet/familiar/pondstone_toad = /mob/living/carbon/human/species/familiar/pondstone_toad,
+	/mob/living/simple_animal/pet/familiar/mist_lynx = /mob/living/carbon/human/species/familiar/mist_lynx,
+	/mob/living/simple_animal/pet/familiar/rune_rat = /mob/living/carbon/human/species/familiar/rune_rat,
+	/mob/living/simple_animal/pet/familiar/vaporroot_wisp = /mob/living/carbon/human/species/familiar/vaporroot_wisp,
+	/mob/living/simple_animal/pet/familiar/ashcoiler = /mob/living/carbon/human/species/familiar/ashcoiler,
+	/mob/living/simple_animal/pet/familiar/glimmer_hare = /mob/living/carbon/human/species/familiar/glimmer_hare,
+	/mob/living/simple_animal/pet/familiar/hollow_antlerling = /mob/living/carbon/human/species/familiar/hollow_antlerling,
+	/mob/living/simple_animal/pet/familiar/gravemoss_serpent = /mob/living/carbon/human/species/familiar/gravemoss_serpent,
+	/mob/living/simple_animal/pet/familiar/starfield_crow = /mob/living/carbon/human/species/familiar/starfield_crow,
+	/mob/living/simple_animal/pet/familiar/emberdrake = /mob/living/carbon/human/species/familiar/emberdrake,
+	/mob/living/simple_animal/pet/familiar/ripplefox = /mob/living/carbon/human/species/familiar/ripplefox,
+	/mob/living/simple_animal/pet/familiar/whisper_stoat = /mob/living/carbon/human/species/familiar/whisper_stoat,
+	/mob/living/simple_animal/pet/familiar/thornback_turtle = /mob/living/carbon/human/species/familiar/thornback_turtle,
+))
+
 GLOBAL_LIST_INIT(familiar_display_names, list(
 	/mob/living/simple_animal/pet/familiar/pondstone_toad = "Pondstone Toad",
 	/mob/living/simple_animal/pet/familiar/mist_lynx = "Mist Lynx",

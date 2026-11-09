@@ -1,7 +1,3 @@
-#define FAMILIAR_SEE_IN_DARK 6
-#define FAMILIAR_MIN_BODYTEMP 200
-#define FAMILIAR_MAX_BODYTEMP 400
-
 /*
 	Familiar list and buffs below.
 	Sprites by Diltyrr (those aren't good gah)
@@ -152,11 +148,6 @@
 	speak_emote = list("croaks low", "grumbles")
 	emote_hear = list("croaks lowly.", "lets out a bubbling sound.")
 	emote_see = list("shudders like stone.", "thumps softly in place.")
-	var/icon/original_icon = null
-	var/original_icon_state = ""
-	var/original_icon_living = ""
-	var/original_name = ""
-	var/stoneform = FALSE
 
 /datum/status_effect/buff/familiar/settled_weight
 	id = "settled_weight"
@@ -191,7 +182,6 @@
 	speak_emote = list("purrs softly", "whispers")
 	emote_hear = list("lets out a soft yowl.", "whispers almost silently.")
 	emote_see = list("pads in a circle.", "vanishes briefly, then reappears.")
-	var/list/saved_trails = list()
 
 /datum/status_effect/buff/familiar/silver_glance
 	id = "silver_glance"
@@ -222,8 +212,6 @@
 	speak_emote = list("squeaks", "chatters")
 	emote_hear = list("squeaks thoughtfully.", "sniffs the air.")
 	emote_see = list("twitches its tail in patterns.", "skitters in a loop.")
-	var/stored_books = list()
-	var/storage_limit = 5
 
 /datum/status_effect/buff/familiar/threaded_thoughts
 	id = "threaded_thoughts"
