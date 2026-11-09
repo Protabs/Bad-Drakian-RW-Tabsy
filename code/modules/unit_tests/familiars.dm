@@ -45,3 +45,13 @@
 	TEST_ASSERT_EQUAL(rat.stat, DEAD, "Familiar did not die")
 	TEST_ASSERT(!length(rat.stored_books), "Stored items were not released on death")
 	TEST_ASSERT_EQUAL(stored_paper.loc, rat.loc, "Stored items were not dropped where the familiar died")
+
+/// The preferences UI can draw a preview and list abilities for every registered familiar.
+/datum/unit_test/familiar_prefs_preview/Run()
+	var/datum/familiar_prefs/preferences = new
+	for(var/familiar_name in GLOB.familiar_types)
+		var/familiar_type = GLOB.familiar_types[familiar_name]
+		preferences.familiar_specie = familiar_type
+		TEST_ASSERT(length(preferences.get_familiar_preview_html()), "[familiar_name] has no preview sprite")
+		TEST_ASSERT(length(GLOB.familiar_ability_blurbs[familiar_type]), "[familiar_name] has no ability blurbs")
+	qdel(preferences)
