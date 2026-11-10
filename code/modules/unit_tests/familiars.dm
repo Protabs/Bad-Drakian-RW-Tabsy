@@ -55,3 +55,23 @@
 		TEST_ASSERT(length(preferences.get_familiar_preview_html()), "[familiar_name] has no preview sprite")
 		TEST_ASSERT(length(GLOB.familiar_ability_blurbs[familiar_type]), "[familiar_name] has no ability blurbs")
 	qdel(preferences)
+
+/// Ensures requirements for free familiar spawning are met.
+/datum/unit_test/familiar_free_spawn/Run()
+	allocate(/obj/structure/well/fountain/mana, run_loc_floor_bottom_left)
+	var/turf/spawn_turf = get_familiar_fountain_spawn_turf()
+	TEST_ASSERT_NOTNULL(spawn_turf, "No spawn tile was found beside a mana fountain")
+	TEST_ASSERT(isopenturf(spawn_turf), "The spawn tile is not open ground")
+
+	var/datum/familiar_prefs/preferences = new
+	TEST_ASSERT(!preferences.has_required_details(), "Empty preferences counted as complete")
+	preferences.familiar_name = "Test"
+	TEST_ASSERT(!preferences.has_required_details(), "A name alone counted as complete")
+	preferences.familiar_flavortext_display = "A description."
+	preferences.familiar_specie = /mob/living/simple_animal/pet/familiar/rune_rat
+	TEST_ASSERT(preferences.has_required_details(), "Complete preferences were rejected")
+
+	var/mob/living/carbon/human/bystander = allocate(/mob/living/carbon/human/consistent)
+	TEST_ASSERT(preferences.get_free_spawn_block_reason(bystander), "A player already in the round could spawn as a familiar")
+	TEST_ASSERT_NULL(awaken_familiar(bystander, spawn_turf), "A mob with no client was turned into a familiar")
+	qdel(preferences)

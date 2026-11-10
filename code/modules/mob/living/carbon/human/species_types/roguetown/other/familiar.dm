@@ -29,6 +29,7 @@
 	var/storage_limit = 5
 	var/list/saved_trails = list()
 	var/stoneform = FALSE
+	var/free_spawn_ckey
 
 /mob/living/carbon/human/species/familiar/Initialize(mapload)
 	. = ..()

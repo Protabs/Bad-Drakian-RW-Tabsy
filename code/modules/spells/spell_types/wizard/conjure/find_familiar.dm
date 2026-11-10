@@ -294,64 +294,77 @@
 /proc/spawn_familiar_for_player(mob/chosen_one, mob/living/carbon/user)
 	if (!chosen_one || !user)
 		return
+	awaken_familiar(chosen_one, get_step(user, user.dir), user)
+
+/// Moves a player into a new familiar built from their familiar preferences. Without a summoner it is a free familiar.
+/proc/awaken_familiar(mob/chosen_one, turf/spawn_turf, mob/living/carbon/summoner)
+	if (!chosen_one || !spawn_turf)
+		return null
+	var/mob/notify = summoner || chosen_one
 
 	// Handle if the chosen one is a new player lobby mob
-	if (isnewplayer(chosen_one))
+	var/from_lobby = isnewplayer(chosen_one)
+	if (from_lobby)
 		var/mob/dead/new_player/new_chosen = chosen_one
 		new_chosen.close_spawn_windows()
 
 	// Ensure the chosen one has a valid client and preferences
 	var/client/client_ref = chosen_one.client
 	if (!client_ref || !client_ref.prefs)
-		to_chat(user, span_warning("Familiar summoning failed: The target has no preferences or is invalid."))
-		return
+		to_chat(notify, span_warning("Familiar summoning failed: The target has no preferences or is invalid."))
+		return null
 
 	var/datum/familiar_prefs/prefs = client_ref.prefs.familiar_prefs
 	if (!prefs || !prefs.familiar_specie)
-		to_chat(user, span_warning("Familiar summoning failed: The target has no valid familiar form."))
-		return
+		to_chat(notify, span_warning("Familiar summoning failed: The target has no valid familiar form."))
+		return null
 
 	var/player_familiar_type = GLOB.familiar_player_types[prefs.familiar_specie]
 	if (!ispath(player_familiar_type, /mob/living/carbon/human/species/familiar))
-		to_chat(user, span_warning("Familiar summoning failed: The target has no valid familiar form."))
-		return
+		to_chat(notify, span_warning("Familiar summoning failed: The target has no valid familiar form."))
+		return null
 
 	if (!chosen_one.mind)
-		to_chat(user, span_warning("Familiar summoning failed: Target has no mind to transfer."))
-		return
+		to_chat(notify, span_warning("Familiar summoning failed: Target has no mind to transfer."))
+		return null
 
-	// Spawn the familiar mob near the summoner
-	var/turf/spawn_turf = get_step(user, user.dir)
+	var/spawn_ckey = chosen_one.ckey
 	var/mob/living/carbon/human/species/familiar/awakener = new player_familiar_type(spawn_turf)
 	if (!awakener)
-		to_chat(user, span_warning("Familiar summoning failed: Could not create familiar."))
-		return
+		to_chat(notify, span_warning("Familiar summoning failed: Could not create familiar."))
+		return null
 
 	// Set summoner and name
-	awakener.familiar_summoner = user
+	awakener.familiar_summoner = summoner
+	if (!summoner)
+		awakener.free_spawn_ckey = spawn_ckey
 	awakener.fully_replace_character_name(null, prefs.familiar_name)
 	awakener.pronouns = prefs.familiar_pronouns
 	awakener.color = "#[prefs.familiar_color]"
 
 	// Display summoning emote
-	user.visible_message(span_notice("[awakener.summoning_emote]"))
+	var/atom/emote_source = summoner || awakener
+	emote_source.visible_message(span_notice("[awakener.summoning_emote]"))
 
 	// Apply summoner's familiar buff
-	if (awakener.buff_given)
-		user.apply_status_effect(awakener.buff_given)
+	if (summoner && awakener.buff_given)
+		summoner.apply_status_effect(awakener.buff_given)
 
 	// Transfer player's mind to the familiar
 	chosen_one.mind.transfer_to(awakener, 1)
 	var/datum/mind/mind_datum = awakener.mind
 	if (!mind_datum)
-		to_chat(user, span_warning("Familiar summoning failed: Mind transfer failed."))
+		to_chat(notify, span_warning("Familiar summoning failed: Mind transfer failed."))
 		qdel(awakener)
-		return
+		return null
+	if (from_lobby)
+		awakener.stop_sound_channel(CHANNEL_LOBBYMUSIC)
 
 	// Clear existing spells, then grant familiar communication
 	mind_datum.RemoveAllSpells()
-	mind_datum.AddSpell(new /obj/effect/proc_holder/spell/self/message_summoner)
-	user.mind?.AddSpell(new /obj/effect/proc_holder/spell/self/message_familiar)
+	if (summoner)
+		mind_datum.AddSpell(new /obj/effect/proc_holder/spell/self/message_summoner)
+		summoner.mind?.AddSpell(new /obj/effect/proc_holder/spell/self/message_familiar)
 
 	// Add familiar's inherent spells
 	if (awakener.inherent_spell)
@@ -361,11 +374,31 @@
 				if (spell_instance)
 					mind_datum.AddSpell(spell_instance)
 
-	var/faction_to_add = "[user.mind.current.real_name]_faction" //Should stop necromancer's skellies from murdering the necromancer's pet.
-	awakener.faction |= faction_to_add
+	if (summoner)
+		var/faction_to_add = "[summoner.mind.current.real_name]_faction" //Should stop necromancer's skellies from murdering the necromancer's pet.
+		awakener.faction |= faction_to_add
 
 	// Admin/game logging
-	log_game("[key_name(user)] has summoned [key_name(chosen_one)] as familiar '[awakener.name]' ([awakener.type]).")
+	if (summoner)
+		log_game("[key_name(summoner)] has summoned [key_name(awakener)] as familiar '[awakener.name]' ([awakener.type]).")
+	else
+		log_game("[key_name(awakener)] has spawned as familiar '[awakener.name]' ([awakener.type]) without a summoner.")
+	return awakener
+
+/// Finds an open tile near a random mana fountain, or null if there is no fountain with room around it.
+/proc/get_familiar_fountain_spawn_turf()
+	var/list/fountains = list()
+	for (var/obj/structure/well/fountain/mana/fountain in world)
+		if (isturf(fountain.loc))
+			fountains += fountain
+	for (var/obj/structure/well/fountain/mana/fountain as anything in shuffle(fountains))
+		var/list/candidates = list()
+		for (var/turf/open/floor/candidate in orange(FAMILIAR_FOUNTAIN_SPAWN_RANGE, fountain))
+			if (!candidate.is_blocked_turf(TRUE))
+				candidates += candidate
+		if (length(candidates))
+			return pick(candidates)
+	return null
 
 /obj/effect/proc_holder/spell/self/message_familiar
 	name = "Message Familiar"

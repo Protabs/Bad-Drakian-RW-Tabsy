@@ -17,6 +17,7 @@ GLOBAL_LIST_INIT(familiar_types, list(
 #define FAMILIAR_SEE_IN_DARK 6
 #define FAMILIAR_MIN_BODYTEMP 200
 #define FAMILIAR_MAX_BODYTEMP 400
+#define FAMILIAR_FOUNTAIN_SPAWN_RANGE 3
 
 /// Non-sentient (simple animal) familiar type -> human-based type a player controls when awakened.
 GLOBAL_LIST_INIT(familiar_player_types, list(

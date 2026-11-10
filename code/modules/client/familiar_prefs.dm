@@ -18,6 +18,57 @@
 	. = ..()
 	prefs = passed_prefs
 
+/// A familiar needs a name, a description and a type before it can be queued or spawned.
+/datum/familiar_prefs/proc/has_required_details()
+	return familiar_name && familiar_flavortext_display && familiar_specie
+
+/// Why this player can't spawn as a familiar right now, or null if they can. Spawning is only for lobby players once the round is running.
+/datum/familiar_prefs/proc/get_free_spawn_block_reason(mob/user)
+	if (!isnewplayer(user) || !user.client)
+		return "I can only spawn as a familiar from the lobby."
+	if (!SSticker.IsRoundInProgress())
+		return "I can only spawn as a familiar once the round has started."
+	if (SSticker.late_join_disabled)
+		return "Joining the round is currently disabled."
+	if (!has_required_details())
+		return "I must set my Familiar's name, description, and type before I can spawn."
+	if (!ispath(GLOB.familiar_player_types[familiar_specie], /mob/living/carbon/human/species/familiar))
+		return "My familiar type is no longer available. Please choose another."
+	for (var/mob/living/carbon/human/species/familiar/existing in GLOB.alive_mob_list)
+		if (existing.free_spawn_ckey == user.ckey && existing.stat != DEAD)
+			return "I already have a living familiar."
+	return null
+
+/// Lets a lobby player enter the round directly as their familiar, next to a mana fountain.
+/datum/familiar_prefs/proc/spawn_as_familiar(mob/user)
+	var/block_reason = get_free_spawn_block_reason(user)
+	if (block_reason)
+		to_chat(user, span_warning(block_reason))
+		return FALSE
+	if (!get_familiar_fountain_spawn_turf())
+		to_chat(user, span_warning("There is no mana fountain to appear beside."))
+		return FALSE
+
+	var/confirm = alert(user, "Enter the world as [familiar_name] beside a mana fountain? You will leave the lobby.", "Spawn as Familiar", "Yes", "No")
+	if (confirm != "Yes")
+		return FALSE
+
+	block_reason = get_free_spawn_block_reason(user)
+	if (block_reason)
+		to_chat(user, span_warning(block_reason))
+		return FALSE
+	var/turf/spawn_turf = get_familiar_fountain_spawn_turf()
+	if (!spawn_turf)
+		to_chat(user, span_warning("There is no mana fountain to appear beside."))
+		return FALSE
+
+	var/client/spawning_client = user.client
+	winset(user, "Be a Familiar", "is-visible=false")
+	if (!awaken_familiar(user, spawn_turf))
+		return FALSE
+	GLOB.familiar_queue -= spawning_client
+	return TRUE
+
 /datum/familiar_prefs/proc/get_familiar_preview_html()
 	if(!familiar_specie)
 		return ""
@@ -121,6 +172,12 @@
 		dat += "<br><a href='?_src_=familiar_prefs;preference=familiar_queue;task=leave'>Leave Queue</a>"
 	else
 		dat += "<br><a href='?_src_=familiar_prefs;preference=familiar_queue;task=join'>Queue Up</a>"
+
+	if (isnewplayer(client.mob))
+		if (SSticker.IsRoundInProgress() && !SSticker.late_join_disabled)
+			dat += "<br><a href='?_src_=familiar_prefs;preference=familiar_spawn;task=spawn'>Spawn as Familiar</a>"
+		else
+			dat += "<br><i>Spawning as a familiar is available once the round has started.</i>"
 
 	
 	dat += "</td><td width='45%' valign='top' align='center'><b>Preview</b>[get_familiar_preview_html()]</td></tr></table>"
@@ -262,7 +319,7 @@
 					to_chat(user, "<span class='warning'>Familiar preferences are not initialized.</span>")
 					return
 
-				if (!fam_pref.familiar_name || !fam_pref.familiar_flavortext_display || !fam_pref.familiar_specie)
+				if (!fam_pref.has_required_details())
 					to_chat(user, "<span class='warning'>You must set your Familiar's name, description, and type before joining the queue.</span>")
 					return
 
@@ -287,6 +344,10 @@
 					log_game("[user] has set familiar type to [choice]")
 				else
 					to_chat(user, span_warning("Something went wrong selecting that familiar type."))
+
+		if ("familiar_spawn")
+			if (task == "spawn" && spawn_as_familiar(user))
+				return
 
 	if(user.client)
 		fam_show_ui()
