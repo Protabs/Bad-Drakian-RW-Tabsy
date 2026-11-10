@@ -278,6 +278,9 @@
   - rscadd: you can now make grenzelhoftian gloves
   - balance: it now takes one extra fiber to craft fingerless leather gloves, diminishing
       the returns from infinitely crafting and snipping them
+  _Rarity:
+  - rscadd: Shift-click the eye HUD to close your eyes and stay awake.
+  - qol: Automatic snores during sleep no longer appear in chat.
   mypingishuge:
   - bugfix: Hypnosis consent toggle messages now match the style of other consent
       toggles.
@@ -290,3 +293,17 @@
   - rscadd: Eligible races without taur options can choose Digitigrade Big Legs or
       Digitigrade Big Legs, Stanced.
   - spellcheck: Renamed both Big Legs options to identify them as digitigrade.
+  - rscadd: Lamias can now choose from 50 horn styles and the same ear and snout choices
+      as Wild-Kin.
+  - bugfix: Removed the empty Parent loadout datum entry from loadout selection.
+  - bugfix: Hypnotic Gaze and Hypnotic Presence keep their custom examine text and
+      color when transforming and reverting.
+  - bugfix: Werewolf transformation creates properly registered organs instead of
+      invalid organ entries.
+  - bugfix: Examine descriptions omit empty fragments and punctuate standalone descriptions.
+  mypingishuge <3 _Rarity:
+  - bugfix: Equipment tooltips now preserve line breaks, bold text, and italics in
+      item descriptions.
+2026-11-10:
+  _Rarity:
+  - rscadd: Restored Xylix Pink as a delectable dye color.
